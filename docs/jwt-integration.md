@@ -95,18 +95,15 @@ Service verifies internal only, applies policy, returns data
   "iss": "https://gateway.internal",
   "aud": "bond-math.api",
   "sub": "user:12345",
-  "scp": ["read:public"],
+  "org_id": "org123",
   "roles": ["analyst"],
+  "permissions": ["read:public", "valuation:write"],
   "cid": "req-9b2...",
   "iat": 1730440000,
   "exp": 1730440900,
   "act": {
-    "iss": "https://tenant.auth0.com/",
-    "sub": "auth0|123",
-    "perms": ["read:public", "valuation:write"],
-    "role": "analyst",
-    "org": "org123",
-    "uid": "user456"
+    "iss": "https://gateway.internal",
+    "sub": "service:gateway"
   }
 }
 ```
@@ -121,26 +118,28 @@ Service verifies internal only, applies policy, returns data
 
 **Custom Claims:**
 
-- `scp` (Scopes): Normalized permissions array
+- `org_id`: Organization identifier for multi-tenant access control
 - `roles`: User role array
+- `permissions`: Permission strings array
 - `cid` (Correlation ID): Request tracing ID
-- `act` (Actor): RFC 8693 actor claim (user context)
+- `act` (Actor): RFC 8693 actor claim (identifies service acting on behalf of user)
 
 ### Actor Claim (RFC 8693)
 
-The `act` claim preserves user identity through the service chain:
+The `act` claim identifies which service is acting on behalf of the user, enabling delegation tracking and audit trails:
 
 ```typescript
 import type { ActorClaim } from '@chrislyons-dev/flarelette-jwt'
 
 // ActorClaim structure from flarelette-jwt:
 interface ActorClaim {
-  sub: string      // Service identifier acting on behalf of original subject
+  iss: string      // Issuer of the acting service
+  sub: string      // Service identifier acting on behalf of the user
   act?: ActorClaim // Nested actor for delegation chains (recursive)
 }
 
-// Additional user context typically stored in the main JWT payload claims
-// (e.g., roles, permissions, org, etc.) rather than in the actor claim
+// User context (roles, permissions, org_id) is stored in the main JWT payload,
+// not in the actor claim. The actor identifies the SERVICE, not the user.
 ```
 
 **TypeScript Access:**
@@ -151,14 +150,23 @@ import type { JwtPayload } from '@chrislyons-dev/flarelette-jwt'
 app.get('/reports', authGuard(), async (c) => {
   const auth: JwtPayload = c.get('auth')
 
-  if (auth.actor) {
-    // actor.sub contains the service identifier
-    // Additional context would be in custom claims
-    const reports = await fetchReports({ user: auth.sub })
-    return c.json({ reports })
+  // Organization context typically in main payload claims
+  // Actor claim identifies the delegating service (RFC 8693)
+  const org = auth.org_id || auth.tid  // Use standard OIDC claims
+
+  if (!org) {
+    return c.json({ error: 'No organization context' }, 400)
   }
 
-  return c.json({ error: 'No actor context' }, 400)
+  const reports = await fetchReports({ user: auth.sub, organization: org })
+
+  console.log({
+    user: auth.sub,
+    actor: auth.actor?.sub,  // Service acting on behalf
+    org,
+  })
+
+  return c.json({ reports })
 })
 ```
 
@@ -228,7 +236,27 @@ GET https://gateway.internal/.well-known/jwks.json
 
 **Secret Management (Gateway):**
 
-**Critical:** Private keys should be ephemeral and rotated automatically. Never commit keys to version control.
+**Critical:** Private keys should be ephemeral and rotated automatically. Never commit keys to version control. This key generation should occur **during automated deployment** (CI/CD pipeline), not manually.
+
+**Example CI/CD workflow (GitHub Actions):**
+
+```yaml
+# .github/workflows/deploy.yml
+- name: Generate and store EdDSA keypair
+  run: |
+    # Generate keypair (secret never leaves CI environment)
+    openssl genpkey -algorithm ed25519 -outform PEM -out private.pem
+
+    # Store in Cloudflare Workers Secrets via API
+    wrangler secret put GATEWAY_PRIVATE_KEY < private.pem
+
+    # Immediately shred (no persistence)
+    shred -u private.pem
+  env:
+    CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+```
+
+**Manual setup (development/testing only):**
 
 ```bash
 # Generate Ed25519 keypair during deployment
@@ -352,39 +380,37 @@ JWT_AUD = "bond-math.api"
 
 **Secret Management:**
 
+**Critical:** Secrets should be ephemeral and generated during automated deployment (CI/CD pipeline). No human should ever see these secrets.
+
 **Generate Cryptographically Secure Secret:**
 
 ```bash
-# Generate 48-byte (384-bit) secret during deployment
-SECRET=$(openssl rand -base64 48)
-
-# Store in Cloudflare Workers Secrets (no human ever sees this)
-echo "$SECRET" | wrangler secret put INTERNAL_JWT_SECRET --env production
+# Generate and store 48-byte (384-bit) secret during deployment
+# Secret never stored in a variable or file
+openssl rand -base64 48 | wrangler secret put INTERNAL_JWT_SECRET --env production
 ```
 
 **Automated Rotation (Zero-Downtime):**
 
 ```bash
 #!/bin/bash
-# Rotate HS512 secret every 90 days
+# Rotate HS512 secret every 90 days (automated via CI/CD)
 
-# 1. Generate new secret
-NEW_SECRET=$(openssl rand -base64 48)
+# 1. Generate and store new secret (no human ever sees this)
+openssl rand -base64 48 | wrangler secret put INTERNAL_JWT_SECRET_NEW --env production
 
-# 2. Store as new secret
-echo "$NEW_SECRET" | wrangler secret put INTERNAL_JWT_SECRET_NEW --env production
+# 2. Update gateway configuration to sign with new secret
+# (Deploy updated wrangler.toml with JWT_SECRET_NAME=INTERNAL_JWT_SECRET_NEW)
 
-# 3. Update gateway to sign with new secret
-# Update JWT_SECRET_NAME=INTERNAL_JWT_SECRET_NEW
-
-# 4. Wait for max TTL (15 minutes)
+# 3. Wait for max TTL (15 minutes) for old tokens to expire
 sleep 900
 
-# 5. Remove old secret
+# 4. Remove old secret
 wrangler secret delete INTERNAL_JWT_SECRET --env production
 
-# 6. Rename new → current
-echo "$NEW_SECRET" | wrangler secret put INTERNAL_JWT_SECRET --env production
+# 5. Rename new secret to current
+# (Regenerate and store as INTERNAL_JWT_SECRET without intermediate variables)
+openssl rand -base64 48 | wrangler secret put INTERNAL_JWT_SECRET --env production
 wrangler secret delete INTERNAL_JWT_SECRET_NEW --env production
 ```
 
@@ -870,6 +896,16 @@ if (payload === null) {
   console.log('Verified:', payload)
 }
 ```
+
+---
+
+## Next Steps
+
+- **Quick implementation**: Start with [Strategy 3 (HS512)](#strategy-3-hs512-with-shared-secret) for development
+- **Production deployment**: Upgrade to [Strategy 1 (EdDSA with Service Binding)](#strategy-1-eddsa-with-service-binding-recommended)
+- **Usage patterns**: See [Usage Patterns](#usage-patterns) for authentication and authorization examples
+- **API reference**: Read [API Design](./api-design.md) for complete middleware documentation
+- **Architecture details**: Review [Architecture](./architecture.md) for system design overview
 
 ---
 

@@ -268,7 +268,7 @@ import type { JwtPayload, ActorClaim } from '@chrislyons-dev/flarelette-jwt'
 
 - `roles`: User role array (e.g., `['analyst', 'verified']`)
 - `permissions` or `scp`: Permissions array (e.g., `['read:reports', 'write:data']`)
-- `actor`: RFC 8693 actor claim (user context)
+- `actor`: RFC 8693 actor claim (identifies service acting on behalf of user)
 
 **Usage:**
 
@@ -292,7 +292,7 @@ app.get('/data', authGuard(), async (c) => {
 
 #### `ActorClaim`
 
-RFC 8693 actor claim preserving original user identity.
+RFC 8693 actor claim identifying the service acting on behalf of the user.
 
 **Type Definition:**
 Uses `ActorClaim` from `@chrislyons-dev/flarelette-jwt`:
@@ -301,16 +301,17 @@ Uses `ActorClaim` from `@chrislyons-dev/flarelette-jwt`:
 import type { ActorClaim } from '@chrislyons-dev/flarelette-jwt'
 
 // ActorClaim structure:
-// - sub: Service identifier acting on behalf of original subject
+// - iss: Issuer of the acting service
+// - sub: Service identifier acting on behalf of the user
 // - act?: Nested actor for delegation chains (recursive)
 ```
 
 **RFC 8693 Alignment:**
 
 - Maps to `act` claim in internal JWT
-- Represents "who the gateway is acting on behalf of"
-- Preserves original user identity through service chain
-- Supports recursive delegation chains
+- Identifies which service is acting on behalf of the user (delegation)
+- Enables audit trails showing which services handled the request
+- Supports recursive delegation chains for multi-hop scenarios
 
 **Usage:**
 
@@ -318,20 +319,24 @@ import type { ActorClaim } from '@chrislyons-dev/flarelette-jwt'
 app.get('/reports', authGuard(), async (c) => {
   const auth = c.get('auth')
 
-  if (auth.actor) {
-    console.log(auth.actor.iss)   // 'https://tenant.auth0.com/'
-    console.log(auth.actor.sub)   // 'auth0|123'
-    console.log(auth.actor.org)   // 'org123'
+  // Organization context typically in main payload claims (not actor)
+  // Actor claim identifies the delegating service (RFC 8693)
+  const org = auth.org_id || auth.tid  // Use standard OIDC claims
 
-    // Filter data by organization
-    const reports = await fetchReports({
-      organization: auth.actor.org
-    })
-
-    return c.json({ reports })
+  if (!org) {
+    return c.json({ error: 'No organization context' }, 400)
   }
 
-  return c.json({ error: 'No actor context' }, 400)
+  // Filter data by organization
+  const reports = await fetchReports({ organization: org })
+
+  console.log({
+    user: auth.sub,
+    actor: auth.actor?.sub,  // Service acting on behalf
+    org,
+  })
+
+  return c.json({ reports })
 })
 ```
 
@@ -349,7 +354,7 @@ Extended Hono environment with authentication context.
 interface HonoEnv {
   Bindings: CloudflareBindings
   Variables: {
-    auth: AuthContext
+    auth: JwtPayload
   }
 }
 
@@ -429,6 +434,16 @@ app.get('/data', authGuard(), async (c) => {
 
 ---
 
+## Next Steps
+
+- **Complete policy builder reference**: See [Policy Builder section](#policy-builder) for all policy methods
+- **JWT payload structure**: See [JWT Payload Context](#jwt-payload-context) for claim details
+- **Configuration strategies**: Read [JWT Integration Guide](./jwt-integration.md#configuration-strategies) for EdDSA vs HS512
+- **Architecture overview**: Review [Architecture](./architecture.md) for system design
+- **Testing patterns**: See [CONTRIBUTING.md](../CONTRIBUTING.md#testing-requirements) for test examples
+
+---
+
 ## Type Definitions
 
 ### Core Types
@@ -459,7 +474,7 @@ import type { JwtPayload, ActorClaim } from '@chrislyons-dev/flarelette-jwt'
 interface HonoEnv {
   Bindings: CloudflareBindings
   Variables: {
-    auth: AuthContext
+    auth: JwtPayload
   }
 }
 
@@ -583,7 +598,10 @@ const app = new Hono<HonoEnv>()
 app.get('/data', authGuard(), async (c) => {
   const auth = c.get('auth')
 
-  if (!auth.actor?.org) {
+  // Organization context in main payload (org_id or tid)
+  const org = auth.org_id || auth.tid
+
+  if (!org) {
     return c.json({ error: 'No organization context' }, 400)
   }
 
@@ -591,7 +609,7 @@ app.get('/data', authGuard(), async (c) => {
   const data = await db
     .select()
     .from('data')
-    .where('organization_id', auth.actor.org)
+    .where('organization_id', org)
 
   return c.json({ data })
 })
@@ -605,10 +623,13 @@ app.post('/data', authGuard(orgAdminPolicy), async (c) => {
   const auth = c.get('auth')
   const body = await c.req.json()
 
+  // Organization context in main payload
+  const org = auth.org_id || auth.tid
+
   // Enforce organization boundary
   const data = await db.insert('data', {
     ...body,
-    organization_id: auth.actor?.org,
+    organization_id: org,
     created_by: auth.sub,
   })
 
@@ -693,14 +714,18 @@ export default app
 ```typescript
 import { Hono } from 'hono'
 import { authGuard, policy } from '@chrislyons-dev/flarelette-hono'
-import type { HonoEnv, AuthContext } from '@chrislyons-dev/flarelette-hono'
+import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
+import type { Context, Next } from 'hono'
 
 // Custom middleware that requires auth
 const requireOrganization = () => {
   return async (c: Context<HonoEnv>, next: Next) => {
     const auth = c.get('auth')  // JwtPayload
 
-    if (!auth.actor?.org) {
+    // Organization context in main payload claims
+    const org = auth.org_id || auth.tid
+
+    if (!org) {
       return c.json({ error: 'Organization context required' }, 400)
     }
 
@@ -718,7 +743,8 @@ app.get(
   async (c) => {
     const auth = c.get('auth')
     // Organization is guaranteed to exist here
-    const data = await fetchOrgData(auth.actor!.org!)
+    const org = auth.org_id || auth.tid
+    const data = await fetchOrgData(org!)
     return c.json({ data })
   }
 )
@@ -758,7 +784,7 @@ app.get('/reports', authGuard(policy().rolesAny('analyst', 'admin').needAll('rea
 const app = new Hono<HonoEnv>()
 
 app.get('/data', authGuard(), async (c) => {
-  const auth = c.get('auth')  // Type: AuthContext
+  const auth = c.get('auth')  // Type: JwtPayload
   return c.json({ user: auth.sub })
 })
 ```
@@ -773,28 +799,31 @@ app.get('/data', authGuard(), async (c) => {
 })
 ```
 
-### 3. Handle Missing Actor Context
+### 3. Handle Missing Organization Context
 
 ```typescript
 // ✅ Good: Explicit check
 app.get('/data', authGuard(), async (c) => {
   const auth = c.get('auth')
 
-  if (!auth.actor?.org) {
+  // Organization context in main payload claims
+  const org = auth.org_id || auth.tid
+
+  if (!org) {
     return c.json({ error: 'Organization context required' }, 400)
   }
 
   // org is guaranteed to exist
-  const data = await fetchData(auth.actor.org)
+  const data = await fetchData(org)
   return c.json({ data })
 })
 ```
 
 ```typescript
-// ❌ Bad: Assuming actor exists
+// ❌ Bad: Assuming org exists
 app.get('/data', authGuard(), async (c) => {
   const auth = c.get('auth')
-  const data = await fetchData(auth.actor.org)  // Runtime error if actor is undefined!
+  const data = await fetchData(auth.org_id)  // Runtime error if org_id is undefined!
   return c.json({ data })
 })
 ```
@@ -994,13 +1023,7 @@ app.get('/admin', authGuard(adminPolicy), async (c) => {
 
 **Solution:** Add `HonoEnv` generic to your Hono app:
 
-````typescript
-import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
-
-### 2. Use Type-Safe Context Access
-
 ```typescript
-// ✅ Good: Type-safe with HonoEnv
 import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
 
 const app = new Hono<HonoEnv>()  // Add generic here
@@ -1009,15 +1032,16 @@ app.get('/data', authGuard(), async (c) => {
   const auth = c.get('auth')  // Type: JwtPayload
   return c.json({ user: auth.sub })
 })
-````
+```
+
+**Without HonoEnv (type error):**
 
 ```typescript
-// ❌ Bad: No type safety
-const app = new Hono()
+const app = new Hono()  // ❌ No generic
 
 app.get('/data', authGuard(), async (c) => {
   const auth = c.get('auth')  // Type: unknown
-  return c.json({ user: auth.sub })  // Type error!
+  return c.json({ user: auth.sub })  // ❌ Type error!
 })
 ```
 

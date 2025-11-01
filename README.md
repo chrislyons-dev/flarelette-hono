@@ -1,4 +1,4 @@
-# 🔥 Flarelette-Hono
+# Flarelette-Hono
 
 > **Framework adapter for Cloudflare Workers built on Hono + Flarelette JWT.**
 > Provides clean, declarative JWT authentication and policy enforcement for micro-APIs running on Cloudflare.
@@ -9,7 +9,7 @@
 
 ---
 
-## 🧩 Overview
+## Overview
 
 `flarelette-hono` is the **Hono adapter** for the [`@chrislyons-dev/flarelette-jwt`](https://www.npmjs.com/package/@chrislyons-dev/flarelette-jwt) toolkit.
 It adds route-level middleware, context helpers, and environment injection for a fully self-contained API stack.
@@ -22,19 +22,19 @@ It adds route-level middleware, context helpers, and environment injection for a
 
 ---
 
-## ✨ Features
+## Features
 
-- 🧱 **Framework-native**: integrates seamlessly with [Hono](https://hono.dev) on Cloudflare Workers
-- 🔐 **JWT middleware**: declarative `authGuard(policy)` for route protection
-- 🪪 **Role/permission policies**: simple fluent builder (`policy().rolesAny().needAll()`)
-- ⚙️ **Env injection**: automatically wires Cloudflare bindings (`env`) into jwt-kit
-- 🕵️ **Framework-agnostic core**: built directly atop `@chrislyons-dev/flarelette-jwt`
-- 💨 **Zero config**: if your Worker defines the same `JWT_*` vars used by jwt-kit, you're ready to go
-- 🛡️ **Type-safe**: 100% TypeScript with strict typing — no `any` types
+- **Framework-native**: integrates seamlessly with [Hono](https://hono.dev) on Cloudflare Workers
+- **JWT middleware**: declarative `authGuard(policy)` for route protection
+- **Role/permission policies**: simple fluent builder (`policy().rolesAny().needAll()`)
+- **Env injection**: automatically wires Cloudflare bindings (`env`) into jwt-kit
+- **Framework-agnostic core**: built directly atop `@chrislyons-dev/flarelette-jwt`
+- **Environment-driven**: Configuration via environment variables — no config files required
+- **Type-safe**: 100% TypeScript with strict typing — no `any` types
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install
 
@@ -44,33 +44,84 @@ npm install hono @chrislyons-dev/flarelette-jwt @chrislyons-dev/flarelette-hono
 pnpm add hono @chrislyons-dev/flarelette-jwt @chrislyons-dev/flarelette-hono
 ```
 
-### 2. Example: Protected Route
+### 2. Configure Environment
+
+Set required environment variables in `wrangler.toml`:
+
+```toml
+[vars]
+JWT_ISS = "https://gateway.internal"
+JWT_AUD = "your-service-name"
+JWT_SECRET_NAME = "INTERNAL_JWT_SECRET"
+```
+
+Generate and store secret:
+
+```bash
+openssl rand -base64 48 | wrangler secret put INTERNAL_JWT_SECRET
+```
+
+### 3. Minimal Example (Authentication Only)
 
 ```typescript
 import { Hono } from 'hono'
-import { authGuard, policy } from '@chrislyons-dev/flarelette-hono'
+import { authGuard } from '@chrislyons-dev/flarelette-hono'
 import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
 
 const app = new Hono<HonoEnv>()
+
+// Public endpoint (no auth required)
+app.get('/health', (c) => c.json({ ok: true }))
+
+// Protected endpoint (requires valid JWT)
+app.get('/protected', authGuard(), async (c) => {
+  const auth = c.get('auth')
+  return c.json({ message: 'Hello', user: auth.sub })
+})
+
+export default app
+```
+
+### 4. Example with Policies (Authorization)
+
+Once you understand basic authentication, add role-based access control:
+
+```typescript
+import { authGuard, policy } from '@chrislyons-dev/flarelette-hono'
 
 // Define a policy
 const analystPolicy = policy()
   .rolesAny('analyst', 'admin')
   .needAll('read:reports')
 
-// Protect a route
+// Protect a route with policy
 app.get('/reports', authGuard(analystPolicy), async (c) => {
   const auth = c.get('auth')
   return c.json({ ok: true, sub: auth.sub, roles: auth.roles })
 })
-
-// Public health check
-app.get('/health', (c) => c.json({ ok: true }))
-
-export default app
 ```
 
-### 3. Wrangler Config
+See [API Design](docs/api-design.md) for complete policy builder reference.
+
+### 5. Test Your Setup
+
+Start development server:
+
+```bash
+wrangler dev
+```
+
+Test protected endpoint:
+
+```bash
+# This will return 401 (expected - no JWT)
+curl http://localhost:8787/protected
+
+# Generate test JWT and make authenticated request
+# (See examples/ directory for token generation utilities)
+```
+
+### 6. Wrangler Config Example
 
 ```toml
 name = "bond-consumer"
@@ -88,7 +139,16 @@ JWT_AUD = "bond-math.api"
 
 ---
 
-## 🧱 API Summary
+### Next Steps
+
+- **Basic usage**: See examples above for authentication and policies
+- **Advanced authorization**: Read [API Design](docs/api-design.md#policy-builder) for complex policies
+- **Production deployment**: Review [JWT Integration](docs/jwt-integration.md#configuration-strategies) for EdDSA setup
+- **Testing**: See [CONTRIBUTING.md](CONTRIBUTING.md#testing-requirements) for test patterns
+
+---
+
+## API Summary
 
 ### `authGuard(policy?)`
 
@@ -148,7 +208,7 @@ app.get('/data', authGuard(), async (c) => {
 
 ---
 
-## 🔒 Configuration (shared with jwt-kit)
+## Configuration (shared with jwt-kit)
 
 | Variable                                   | Description                                    |
 | ------------------------------------------ | ---------------------------------------------- |
@@ -161,7 +221,7 @@ app.get('/data', authGuard(), async (c) => {
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 - [Architecture](docs/architecture.md) - System design and component overview
 - [API Design](docs/api-design.md) - Complete API reference and examples
@@ -170,7 +230,7 @@ app.get('/data', authGuard(), async (c) => {
 
 ---
 
-## 🧪 Testing Tips
+## Testing Tips
 
 * Run integration tests in Miniflare with `JWT_SECRET` or a stubbed resolver
 * Use `@chrislyons-dev/flarelette-jwt` CLI to generate 64-byte secrets for HS512
@@ -184,7 +244,7 @@ app.get('/data', authGuard(), async (c) => {
 
 ---
 
-## 🧭 Roadmap
+## Roadmap
 
 * [ ] Optional mTLS / Access integration for external JWKS
 * [ ] KV-backed replay store (`jti`)
@@ -193,7 +253,7 @@ app.get('/data', authGuard(), async (c) => {
 
 ---
 
-## 🔐 Security First
+## Security First
 
 JWT authentication is a critical security boundary. This library prioritizes security over convenience:
 
@@ -207,7 +267,7 @@ See [JWT Integration Guide](docs/jwt-integration.md) for detailed security consi
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
@@ -218,7 +278,7 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
 
 ---
 
-## 📘 License
+## License
 
 MIT © Chris Lyons
 
@@ -226,12 +286,8 @@ Part of the **Flarelette** micro-API toolkit for Cloudflare Workers.
 
 ---
 
-## 🔗 Related Projects
+## Related Projects
 
 - [@chrislyons-dev/flarelette-jwt](https://www.npmjs.com/package/@chrislyons-dev/flarelette-jwt) - JWT toolkit for Cloudflare Workers
 - [Hono](https://hono.dev) - Ultrafast web framework for the edge
 - [Cloudflare Workers](https://developers.cloudflare.com/workers/) - Serverless platform
-
----
-
-**Built with security, clarity, and developer experience in mind.**

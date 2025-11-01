@@ -292,18 +292,15 @@ External Client
   "iss": "https://gateway.internal",
   "aud": "bond-math.api",
   "sub": "user:12345",
-  "scp": ["read:public", "valuation:write"],
+  "org_id": "org123",
   "roles": ["analyst"],
+  "permissions": ["read:public", "valuation:write"],
   "cid": "req-9b2...",
   "iat": 1730440000,
   "exp": 1730440900,
   "act": {
-    "iss": "https://tenant.auth0.com/",
-    "sub": "auth0|123",
-    "perms": ["read:public", "valuation:write"],
-    "role": "analyst",
-    "org": "org123",
-    "uid": "user456"
+    "iss": "https://gateway.internal",
+    "sub": "service:gateway"
   }
 }
 ```
@@ -315,7 +312,7 @@ External Client
 - **Leeway**: 90 seconds (clock skew tolerance)
 - **Audience**: Mesh-wide or service-specific
 - **Issuer**: Gateway (`https://gateway.internal`)
-- **Actor**: RFC 8693 actor claim for user context
+- **Actor**: RFC 8693 actor claim identifying the service acting on behalf of the user
 
 ### Configuration Model
 
@@ -877,6 +874,16 @@ describe('authGuard', () => {
   }
 }
 ```
+
+---
+
+## Next Steps
+
+- **Core component implementation**: See [Core Components](#core-components) for `authGuard` and policy builder details
+- **API reference**: Read [API Design](./api-design.md) for complete API documentation
+- **Configuration setup**: Review [JWT Integration](./jwt-integration.md) for configuration strategies
+- **Type system design**: See [Type System Design](#type-system-design) for strict TypeScript patterns
+- **Testing strategy**: Review [Testing Strategy](#testing-strategy) for test organization and patterns
 
 ---
 
