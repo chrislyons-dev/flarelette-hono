@@ -39,9 +39,15 @@ It adds route-level middleware, context helpers, and environment injection for a
 ### 1. Install
 
 ```bash
+# Core dependencies
 npm install hono @chrislyons-dev/flarelette-jwt @chrislyons-dev/flarelette-hono
-# or
+
+# Strongly recommended: Input validation
+npm install zod @hono/zod-validator
+
+# Or with pnpm
 pnpm add hono @chrislyons-dev/flarelette-jwt @chrislyons-dev/flarelette-hono
+pnpm add zod @hono/zod-validator
 ```
 
 ### 2. Configure Environment
@@ -103,7 +109,46 @@ app.get('/reports', authGuard(analystPolicy), async (c) => {
 
 See [API Design](docs/api-design.md) for complete policy builder reference.
 
-### 5. Test Your Setup
+### 5. Input Validation (Required for Security)
+
+**Input validation is a critical security boundary.** All endpoints that accept input must validate it.
+
+We strongly recommend using [Zod](https://zod.dev/) for type-safe runtime validation:
+
+```bash
+npm install zod @hono/zod-validator
+```
+
+Combine authentication + validation:
+
+```typescript
+import { z } from 'zod'
+import { zValidator } from '@hono/zod-validator'
+
+// Define validation schema
+const createUserSchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1).max(100),
+  age: z.number().int().positive().optional(),
+})
+
+// Apply auth + validation middleware
+app.post(
+  '/users',
+  authGuard(policy().rolesAny('admin')),    // JWT auth + policy
+  zValidator('json', createUserSchema),      // Input validation
+  async (c) => {
+    const auth = c.get('auth')               // Typed JWT payload
+    const body = c.req.valid('json')         // Typed validated input
+
+    return c.json({ ok: true })
+  }
+)
+```
+
+**See [Input Validation Guide](docs/validation.md) for complete security best practices.**
+
+### 6. Test Your Setup
 
 Start development server:
 
@@ -121,7 +166,7 @@ curl http://localhost:8787/protected
 # (See examples/ directory for token generation utilities)
 ```
 
-### 6. Wrangler Config Example
+### 7. Wrangler Config Example
 
 ```toml
 name = "bond-consumer"
@@ -226,6 +271,7 @@ app.get('/data', authGuard(), async (c) => {
 - [Architecture](docs/architecture.md) - System design and component overview
 - [API Design](docs/api-design.md) - Complete API reference and examples
 - [JWT Integration](docs/jwt-integration.md) - Token structure, configuration strategies, and patterns
+- **[Input Validation](docs/validation.md) - Security best practices for validating all input with Zod**
 - [Contributing](CONTRIBUTING.md) - Development setup and guidelines
 
 ---
@@ -255,15 +301,26 @@ app.get('/data', authGuard(), async (c) => {
 
 ## Security First
 
-JWT authentication is a critical security boundary. This library prioritizes security over convenience:
+JWT authentication and input validation are critical security boundaries. This library prioritizes security over convenience:
 
+### Authentication Security
 - **Fail securely**: Invalid tokens return `401`, insufficient permissions return `403`
 - **No detail leakage**: Error messages never expose token structure or validation details
 - **Short-lived tokens**: 5-15 minute TTL recommended
 - **Audience validation**: Prevents token reuse across services
-- **Type-safe**: Strong typing prevents common vulnerabilities
 
-See [JWT Integration Guide](docs/jwt-integration.md) for detailed security considerations.
+### Input Validation Security
+- **Validate all input**: Every endpoint that accepts data must validate it
+- **Use Zod**: Type-safe runtime validation prevents injection attacks and type confusion
+- **Constrain everything**: String lengths, array sizes, numeric ranges, formats
+- **Never trust input**: Even from authenticated users
+
+### Type Safety
+- **100% strict TypeScript**: No `any` types throughout the codebase
+- **Runtime + compile-time validation**: Zod provides both type inference and runtime checks
+- **Strong typing prevents vulnerabilities**: Type confusion and injection attacks are mitigated
+
+See [JWT Integration Guide](docs/jwt-integration.md) and [Input Validation Guide](docs/validation.md) for detailed security considerations.
 
 ---
 
