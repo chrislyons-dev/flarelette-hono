@@ -23,7 +23,8 @@ jobs:
         uses: googleapis/release-please-action@v4
         with:
           release-type: node
-          package-name: '@chrislyons-dev/flarelette-hono'
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
 
   publish-npm:
     name: Publish to NPM
@@ -37,9 +38,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "20"
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
         run: npm ci
@@ -73,9 +74,9 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          registry-url: 'https://npm.pkg.github.com'
+          node-version: "20"
+          cache: "npm"
+          registry-url: "https://npm.pkg.github.com"
 
       - name: Install dependencies
         run: npm ci

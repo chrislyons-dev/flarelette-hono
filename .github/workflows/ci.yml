@@ -135,9 +135,11 @@ jobs:
 
       - name: Check for disallowed licenses
         run: |
-          # Fail if any GPL licenses are found (modify as needed)
-          if grep -i "GPL" THIRD-PARTY-LICENSES.md; then
-            echo "::error::GPL license found in dependencies"
+          # Fail if copyleft GPL licenses are found (excluding LGPL)
+          # This allows MIT, Apache, BSD, ISC, and LGPL licenses
+          if grep -iE "\bGPL\b" THIRD-PARTY-LICENSES.md | grep -v "LGPL"; then
+            echo "::error::Copyleft GPL license found in dependencies"
+            echo "::error::Allowed licenses: MIT, Apache, BSD, ISC, LGPL"
             exit 1
           fi
 

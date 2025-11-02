@@ -129,7 +129,7 @@ app.get('/reports', authGuard(analystPolicy), async (c) => {
 })
 ```
 
-See [API Design](docs/api-design.md) for complete policy builder reference.
+See [API Design](api-design.md) for complete policy builder reference.
 
 ### 5. Input Validation (Required for Security)
 
@@ -168,7 +168,7 @@ app.post(
 )
 ```
 
-**See [Input Validation Guide](docs/validation.md) for complete security best practices.**
+**See [Input Validation Guide](guides/validation.md) for complete security best practices.**
 
 ### 6. Structured Logging (Optional, Recommended for Production)
 
@@ -216,7 +216,7 @@ app.post('/calculate', async (c) => {
 }
 ```
 
-**See [Structured Logging Guide](docs/logging.md) for ADR-0013 standards and best practices.**
+**See [Structured Logging Guide](guides/logging.md) for ADR-0013 standards and best practices.**
 
 ### 7. Test Your Setup
 
@@ -257,9 +257,9 @@ JWT_AUD = "bond-math.api"
 ### Next Steps
 
 - **Basic usage**: See examples above for authentication and policies
-- **Advanced authorization**: Read [API Design](docs/api-design.md#policy-builder) for complex policies
-- **Production deployment**: Review [JWT Integration](docs/jwt-integration.md#configuration-strategies) for EdDSA setup
-- **Testing**: See [CONTRIBUTING.md](CONTRIBUTING.md#testing-requirements) for test patterns
+- **Advanced authorization**: Read [API Design](api-design.md#policy-builder) for complex policies
+- **Production deployment**: Review [JWT Integration](design/jwt-integration.md#configuration-strategies) for EdDSA setup
+- **Testing**: See [CONTRIBUTING.md](../CONTRIBUTING.md#testing-requirements) for test patterns
 
 ---
 
@@ -338,12 +338,12 @@ app.get('/data', authGuard(), async (c) => {
 
 ## Documentation
 
-- [Architecture](docs/architecture.md) - System design and component overview
-- [API Design](docs/api-design.md) - Complete API reference and examples
-- [JWT Integration](docs/jwt-integration.md) - Token structure, configuration strategies, and patterns
-- **[Input Validation](docs/validation.md) - Security best practices for validating all input with Zod**
-- **[Structured Logging](docs/logging.md) - ADR-0013 compliant logging for polyglot microservices**
-- [Contributing](CONTRIBUTING.md) - Development setup and guidelines
+- [Architecture](design/architecture.md) - System design and component overview
+- [API Design](api-design.md) - Complete API reference and examples
+- [JWT Integration](design/jwt-integration.md) - Token structure, configuration strategies, and patterns
+- **[Input Validation](guides/validation.md) - Security best practices for validating all input with Zod**
+- **[Structured Logging](guides/logging.md) - ADR-0013 compliant logging for polyglot microservices**
+- [Contributing](../CONTRIBUTING.md) - Development setup and guidelines
 
 ---
 
@@ -391,7 +391,7 @@ JWT authentication and input validation are critical security boundaries. This l
 - **Runtime + compile-time validation**: Zod provides both type inference and runtime checks
 - **Strong typing prevents vulnerabilities**: Type confusion and injection attacks are mitigated
 
-See [JWT Integration Guide](docs/jwt-integration.md) and [Input Validation Guide](docs/validation.md) for detailed security considerations.
+See [JWT Integration Guide](design/jwt-integration.md) and [Input Validation Guide](guides/validation.md) for detailed security considerations.
 
 ---
 
