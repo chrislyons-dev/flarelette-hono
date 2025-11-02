@@ -81,7 +81,7 @@ function authGuard(policy?: Policy): MiddlewareHandler<HonoEnv>
 ```typescript
 // Require authentication only
 app.get('/protected', authGuard(), async (c) => {
-  const auth = c.get('auth')  // JwtPayload
+  const auth = c.get('auth') // JwtPayload
   return c.json({ user: auth.sub })
 })
 
@@ -93,7 +93,7 @@ app.get('/admin', authGuard(adminPolicy), async (c) => {
 
 // Apply to route group
 const api = new Hono<HonoEnv>()
-api.use('*', authGuard())  // All /api/* routes protected
+api.use('*', authGuard()) // All /api/* routes protected
 
 api.get('/data', async (c) => {
   const auth = c.get('auth')
@@ -136,9 +136,7 @@ function policy(): PolicyBuilder
 Require at least one of the specified roles.
 
 ```typescript
-const policy = policy()
-  .rolesAny('admin', 'analyst')
-  .build()
+const policy = policy().rolesAny('admin', 'analyst').build()
 
 // Passes if auth.roles includes 'admin' OR 'analyst'
 ```
@@ -148,9 +146,7 @@ const policy = policy()
 Require all specified roles.
 
 ```typescript
-const policy = policy()
-  .rolesAll('verified', 'approved')
-  .build()
+const policy = policy().rolesAll('verified', 'approved').build()
 
 // Passes only if auth.roles includes BOTH 'verified' AND 'approved'
 ```
@@ -160,9 +156,7 @@ const policy = policy()
 Require at least one of the specified permissions.
 
 ```typescript
-const policy = policy()
-  .needAny('read:data', 'read:reports')
-  .build()
+const policy = policy().needAny('read:data', 'read:reports').build()
 
 // Passes if auth.permissions includes 'read:data' OR 'read:reports'
 ```
@@ -172,9 +166,7 @@ const policy = policy()
 Require all specified permissions.
 
 ```typescript
-const policy = policy()
-  .needAll('write:reports', 'audit:log')
-  .build()
+const policy = policy().needAll('write:reports', 'audit:log').build()
 
 // Passes only if auth.permissions includes BOTH 'write:reports' AND 'audit:log'
 ```
@@ -194,24 +186,20 @@ Finalize and return immutable policy object.
 
 ```typescript
 // Simple role check
-const analystPolicy = policy()
-  .rolesAny('analyst', 'admin')
+const analystPolicy = policy().rolesAny('analyst', 'admin')
 
 // Simple permission check
-const readPolicy = policy()
-  .needAll('read:reports')
+const readPolicy = policy().needAll('read:reports')
 
 // Combined role + permission
-const adminWritePolicy = policy()
-  .rolesAny('admin')
-  .needAll('write:config', 'audit:log')
+const adminWritePolicy = policy().rolesAny('admin').needAll('write:config', 'audit:log')
 
 // Complex policy
 const complexPolicy = policy()
-  .rolesAny('admin', 'superuser')      // Must have one of these roles
-  .rolesAll('verified')                // AND must have verified role
+  .rolesAny('admin', 'superuser') // Must have one of these roles
+  .rolesAll('verified') // AND must have verified role
   .needAny('read:data', 'read:reports') // AND must have at least one read permission
-  .needAll('audit:access')             // AND must have audit permission
+  .needAll('audit:access') // AND must have audit permission
 ```
 
 **Policy Evaluation:**
@@ -227,9 +215,7 @@ All conditions are combined with AND logic at the top level:
 ```typescript
 // Example: This policy requires:
 // (role=admin OR role=analyst) AND (perm=read:data OR perm=read:reports)
-const policy = policy()
-  .rolesAny('admin', 'analyst')
-  .needAny('read:data', 'read:reports')
+const policy = policy().rolesAny('admin', 'analyst').needAny('read:data', 'read:reports')
 ```
 
 ---
@@ -276,10 +262,10 @@ import type { JwtPayload, ActorClaim } from '@chrislyons-dev/flarelette-jwt'
 app.get('/data', authGuard(), async (c) => {
   const auth: JwtPayload = c.get('auth')
 
-  console.log(auth.iss)          // 'https://gateway.internal'
-  console.log(auth.sub)          // 'user:12345'
-  console.log(auth.roles)        // ['analyst']
-  console.log(auth.permissions)  // ['read:reports']
+  console.log(auth.iss) // 'https://gateway.internal'
+  console.log(auth.sub) // 'user:12345'
+  console.log(auth.roles) // ['analyst']
+  console.log(auth.permissions) // ['read:reports']
 
   // Check claims manually
   if (auth.roles?.includes('admin')) {
@@ -321,7 +307,7 @@ app.get('/reports', authGuard(), async (c) => {
 
   // Organization context typically in main payload claims (not actor)
   // Actor claim identifies the delegating service (RFC 8693)
-  const org = auth.org_id || auth.tid  // Use standard OIDC claims
+  const org = auth.org_id || auth.tid // Use standard OIDC claims
 
   if (!org) {
     return c.json({ error: 'No organization context' }, 400)
@@ -332,7 +318,7 @@ app.get('/reports', authGuard(), async (c) => {
 
   console.log({
     user: auth.sub,
-    actor: auth.actor?.sub,  // Service acting on behalf
+    actor: auth.actor?.sub, // Service acting on behalf
     org,
   })
 
@@ -389,10 +375,10 @@ const app = new Hono<HonoEnv>()
 
 app.get('/protected', authGuard(), async (c) => {
   // Type-safe access to auth context
-  const auth = c.get('auth')  // JwtPayload (not undefined)
+  const auth = c.get('auth') // JwtPayload (not undefined)
 
   // Type-safe access to bindings
-  const issuer = c.env.JWT_ISS  // string | undefined
+  const issuer = c.env.JWT_ISS // string | undefined
 
   return c.json({ user: auth.sub })
 })
@@ -423,9 +409,9 @@ app.use('*', async (c, next) => {
 })
 
 app.get('/data', authGuard(), async (c) => {
-  const auth = c.get('auth')        // JwtPayload
-  const requestId = c.get('requestId')  // string
-  const db = c.env.DB               // D1Database
+  const auth = c.get('auth') // JwtPayload
+  const requestId = c.get('requestId') // string
+  const db = c.env.DB // D1Database
 
   const results = await db.prepare('SELECT * FROM data').all()
   return c.json({ results, requestId, user: auth.sub })
@@ -438,9 +424,9 @@ app.get('/data', authGuard(), async (c) => {
 
 - **Complete policy builder reference**: See [Policy Builder section](#policy-builder) for all policy methods
 - **JWT payload structure**: See [JWT Payload Context](#jwt-payload-context) for claim details
-- **Configuration strategies**: Read [JWT Integration Guide](./jwt-integration.md#configuration-strategies) for EdDSA vs HS512
-- **Architecture overview**: Review [Architecture](./architecture.md) for system design
-- **Testing patterns**: See [CONTRIBUTING.md](../CONTRIBUTING.md#testing-requirements) for test examples
+- **Configuration strategies**: Read [JWT Integration Guide](../design/jwt-integration.md#configuration-strategies) for EdDSA vs HS512
+- **Architecture overview**: Review [Architecture](../design/architecture.md) for system design
+- **Testing patterns**: See the CONTRIBUTING.md file in the repository root for test examples
 
 ---
 
@@ -517,9 +503,7 @@ type VerificationError =
   | 'missing_claims'
 
 // Policy evaluation result
-type PolicyResult =
-  | { allowed: true }
-  | { allowed: false; reason: string }
+type PolicyResult = { allowed: true } | { allowed: false; reason: string }
 ```
 
 ---
@@ -557,13 +541,9 @@ import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
 const app = new Hono<HonoEnv>()
 
 // Define reusable policies
-const analystPolicy = policy()
-  .rolesAny('analyst', 'admin')
-  .needAll('read:reports')
+const analystPolicy = policy().rolesAny('analyst', 'admin').needAll('read:reports')
 
-const adminPolicy = policy()
-  .rolesAny('admin')
-  .needAll('write:config', 'audit:log')
+const adminPolicy = policy().rolesAny('admin').needAll('write:config', 'audit:log')
 
 // Public endpoint
 app.get('/health', (c) => c.json({ ok: true }))
@@ -606,18 +586,13 @@ app.get('/data', authGuard(), async (c) => {
   }
 
   // Filter by organization
-  const data = await db
-    .select()
-    .from('data')
-    .where('organization_id', org)
+  const data = await db.select().from('data').where('organization_id', org)
 
   return c.json({ data })
 })
 
 // Only org admins can create data
-const orgAdminPolicy = policy()
-  .rolesAny('org_admin', 'admin')
-  .needAll('write:data')
+const orgAdminPolicy = policy().rolesAny('org_admin', 'admin').needAll('write:data')
 
 app.post('/data', authGuard(orgAdminPolicy), async (c) => {
   const auth = c.get('auth')
@@ -649,9 +624,7 @@ import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
 const app = new Hono<HonoEnv>()
 
 // Internal service endpoint (called by other Workers via Service Binding)
-const internalPolicy = policy()
-  .rolesAny('service')
-  .needAll('valuation:run')
+const internalPolicy = policy().rolesAny('service').needAll('valuation:run')
 
 app.post('/internal/valuation', authGuard(internalPolicy), async (c) => {
   const auth = c.get('auth')
@@ -659,7 +632,7 @@ app.post('/internal/valuation', authGuard(internalPolicy), async (c) => {
 
   // Log service-to-service call
   console.log({
-    caller: auth.sub,           // 'service:gateway'
+    caller: auth.sub, // 'service:gateway'
     operation: 'valuation',
     requestId: body.requestId,
   })
@@ -720,7 +693,7 @@ import type { Context, Next } from 'hono'
 // Custom middleware that requires auth
 const requireOrganization = () => {
   return async (c: Context<HonoEnv>, next: Next) => {
-    const auth = c.get('auth')  // JwtPayload
+    const auth = c.get('auth') // JwtPayload
 
     // Organization context in main payload claims
     const org = auth.org_id || auth.tid
@@ -736,18 +709,13 @@ const requireOrganization = () => {
 const app = new Hono<HonoEnv>()
 
 // Chain middleware
-app.get(
-  '/org-data',
-  authGuard(),
-  requireOrganization(),
-  async (c) => {
-    const auth = c.get('auth')
-    // Organization is guaranteed to exist here
-    const org = auth.org_id || auth.tid
-    const data = await fetchOrgData(org!)
-    return c.json({ data })
-  }
-)
+app.get('/org-data', authGuard(), requireOrganization(), async (c) => {
+  const auth = c.get('auth')
+  // Organization is guaranteed to exist here
+  const org = auth.org_id || auth.tid
+  const data = await fetchOrgData(org!)
+  return c.json({ data })
+})
 
 export default app
 ```
@@ -760,13 +728,9 @@ export default app
 
 ```typescript
 // ✅ Good: Reusable, testable, documented
-const ANALYST_POLICY = policy()
-  .rolesAny('analyst', 'admin')
-  .needAll('read:reports')
+const ANALYST_POLICY = policy().rolesAny('analyst', 'admin').needAll('read:reports')
 
-const ADMIN_POLICY = policy()
-  .rolesAny('admin')
-  .needAll('write:config', 'audit:log')
+const ADMIN_POLICY = policy().rolesAny('admin').needAll('write:config', 'audit:log')
 
 app.get('/reports', authGuard(ANALYST_POLICY), handler)
 app.put('/config', authGuard(ADMIN_POLICY), handler)
@@ -774,7 +738,11 @@ app.put('/config', authGuard(ADMIN_POLICY), handler)
 
 ```typescript
 // ❌ Bad: Inline, not reusable
-app.get('/reports', authGuard(policy().rolesAny('analyst', 'admin').needAll('read:reports')), handler)
+app.get(
+  '/reports',
+  authGuard(policy().rolesAny('analyst', 'admin').needAll('read:reports')),
+  handler
+)
 ```
 
 ### 2. Use Type-Safe Context Access
@@ -784,7 +752,7 @@ app.get('/reports', authGuard(policy().rolesAny('analyst', 'admin').needAll('rea
 const app = new Hono<HonoEnv>()
 
 app.get('/data', authGuard(), async (c) => {
-  const auth = c.get('auth')  // Type: JwtPayload
+  const auth = c.get('auth') // Type: JwtPayload
   return c.json({ user: auth.sub })
 })
 ```
@@ -794,8 +762,8 @@ app.get('/data', authGuard(), async (c) => {
 const app = new Hono()
 
 app.get('/data', authGuard(), async (c) => {
-  const auth = c.get('auth')  // Type: unknown
-  return c.json({ user: auth.sub })  // Type error!
+  const auth = c.get('auth') // Type: unknown
+  return c.json({ user: auth.sub }) // Type error!
 })
 ```
 
@@ -823,7 +791,7 @@ app.get('/data', authGuard(), async (c) => {
 // ❌ Bad: Assuming org exists
 app.get('/data', authGuard(), async (c) => {
   const auth = c.get('auth')
-  const data = await fetchData(auth.org_id)  // Runtime error if org_id is undefined!
+  const data = await fetchData(auth.org_id) // Runtime error if org_id is undefined!
   return c.json({ data })
 })
 ```
@@ -874,7 +842,7 @@ app.get('/sensitive', authGuard(ADMIN_POLICY), async (c) => {
 // ❌ Bad: Logging token
 app.use('*', async (c, next) => {
   const authHeader = c.req.header('authorization')
-  console.log({ authHeader })  // Never log tokens!
+  console.log({ authHeader }) // Never log tokens!
   await next()
 })
 ```
@@ -1026,10 +994,10 @@ app.get('/admin', authGuard(adminPolicy), async (c) => {
 ```typescript
 import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
 
-const app = new Hono<HonoEnv>()  // Add generic here
+const app = new Hono<HonoEnv>() // Add generic here
 
 app.get('/data', authGuard(), async (c) => {
-  const auth = c.get('auth')  // Type: JwtPayload
+  const auth = c.get('auth') // Type: JwtPayload
   return c.json({ user: auth.sub })
 })
 ```
@@ -1037,11 +1005,11 @@ app.get('/data', authGuard(), async (c) => {
 **Without HonoEnv (type error):**
 
 ```typescript
-const app = new Hono()  // ❌ No generic
+const app = new Hono() // ❌ No generic
 
 app.get('/data', authGuard(), async (c) => {
-  const auth = c.get('auth')  // Type: unknown
-  return c.json({ user: auth.sub })  // ❌ Type error!
+  const auth = c.get('auth') // Type: unknown
+  return c.json({ user: auth.sub }) // ❌ Type error!
 })
 ```
 
@@ -1097,8 +1065,8 @@ app.get('/data', authGuard(policy), async (c) => {
 
 ### Related Documentation
 
-- [Architecture Documentation](./architecture.md)
-- [JWT Integration Guide](./jwt-integration.md)
+- [Architecture Documentation](../design/architecture.md)
+- [JWT Integration Guide](../design/jwt-integration.md)
 
 ### External Resources
 

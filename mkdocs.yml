@@ -113,7 +113,6 @@ nav:
   - API Reference:
       - Overview: api/middleware.md
       - Generated Docs: architecture/README.md
-  - Contributing: ../CONTRIBUTING.md
 
 extra:
   social:

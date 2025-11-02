@@ -1,3 +1,3 @@
 # Development Setup
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for development setup instructions.
+See `CONTRIBUTING.md` in the repository root for development setup instructions.

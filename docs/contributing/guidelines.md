@@ -1,3 +1,3 @@
 # Contributing Guidelines
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for detailed contribution guidelines.
+See `CONTRIBUTING.md` in the repository root for detailed contribution guidelines.

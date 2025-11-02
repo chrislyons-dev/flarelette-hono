@@ -14,11 +14,11 @@
 `flarelette-hono` is the **Hono adapter** for the [`@chrislyons-dev/flarelette-jwt`](https://www.npmjs.com/package/@chrislyons-dev/flarelette-jwt) toolkit.
 It adds route-level middleware, context helpers, and environment injection for a fully self-contained API stack.
 
-| Layer | Responsibility |
-|-------|----------------|
+| Layer                              | Responsibility                                                    |
+| ---------------------------------- | ----------------------------------------------------------------- |
 | **@chrislyons-dev/flarelette-jwt** | Low-level JWT signing, verification, key handling (HS512 + EdDSA) |
-| **flarelette-hono** | Middleware, guards, request/response helpers for Hono |
-| **Your Worker** | Application logic, routes, business rules |
+| **flarelette-hono**                | Middleware, guards, request/response helpers for Hono             |
+| **Your Worker**                    | Application logic, routes, business rules                         |
 
 ---
 
@@ -118,9 +118,7 @@ Once you understand basic authentication, add role-based access control:
 import { authGuard, policy } from '@chrislyons-dev/flarelette-hono'
 
 // Define a policy
-const analystPolicy = policy()
-  .rolesAny('analyst', 'admin')
-  .needAll('read:reports')
+const analystPolicy = policy().rolesAny('analyst', 'admin').needAll('read:reports')
 
 // Protect a route with policy
 app.get('/reports', authGuard(analystPolicy), async (c) => {
@@ -129,7 +127,7 @@ app.get('/reports', authGuard(analystPolicy), async (c) => {
 })
 ```
 
-See [API Design](api-design.md) for complete policy builder reference.
+See [API Design](design/api-design.md) for complete policy builder reference.
 
 ### 5. Input Validation (Required for Security)
 
@@ -157,11 +155,11 @@ const createUserSchema = z.object({
 // Apply auth + validation middleware
 app.post(
   '/users',
-  authGuard(policy().rolesAny('admin')),    // JWT auth + policy
-  zValidator('json', createUserSchema),      // Input validation
+  authGuard(policy().rolesAny('admin')), // JWT auth + policy
+  zValidator('json', createUserSchema), // Input validation
   async (c) => {
-    const auth = c.get('auth')               // Typed JWT payload
-    const body = c.req.valid('json')         // Typed validated input
+    const auth = c.get('auth') // Typed JWT payload
+    const body = c.req.valid('json') // Typed validated input
 
     return c.json({ ok: true })
   }
@@ -194,16 +192,14 @@ app.post('/calculate', async (c) => {
   const auth = c.get('auth')
 
   // Structured logging with context
-  logger.info(
-    { userId: auth.sub, operation: 'calculate' },
-    'Processing calculation'
-  )
+  logger.info({ userId: auth.sub, operation: 'calculate' }, 'Processing calculation')
 
   return c.json({ result: 42 })
 })
 ```
 
 **Output (JSON):**
+
 ```json
 {
   "timestamp": "2025-11-02T12:34:56.789Z",
@@ -257,9 +253,9 @@ JWT_AUD = "bond-math.api"
 ### Next Steps
 
 - **Basic usage**: See examples above for authentication and policies
-- **Advanced authorization**: Read [API Design](api-design.md#policy-builder) for complex policies
+- **Advanced authorization**: Read [API Design](design/api-design.md#policy-builder) for complex policies
 - **Production deployment**: Review [JWT Integration](design/jwt-integration.md#configuration-strategies) for EdDSA setup
-- **Testing**: See [CONTRIBUTING.md](../CONTRIBUTING.md#testing-requirements) for test patterns
+- **Testing**: See the CONTRIBUTING.md file in the repository root for test patterns
 
 ---
 
@@ -269,10 +265,10 @@ JWT_AUD = "bond-math.api"
 
 Hono middleware that:
 
-* extracts the `Authorization: Bearer <jwt>` header
-* validates via jwt-kit
-* enforces the given policy (if provided)
-* injects the verified claims into `c.set('auth', payload)`
+- extracts the `Authorization: Bearer <jwt>` header
+- validates via jwt-kit
+- enforces the given policy (if provided)
+- injects the verified claims into `c.set('auth', payload)`
 
 If validation fails → returns `401 Unauthorized` or `403 Forbidden`.
 
@@ -297,8 +293,8 @@ Fluent builder for permission rules:
 
 ```typescript
 policy()
-  .rolesAny('admin', 'analyst')         // At least one role required
-  .rolesAll('verified', 'approved')     // All roles required
+  .rolesAny('admin', 'analyst') // At least one role required
+  .rolesAll('verified', 'approved') // All roles required
   .needAny('read:data', 'read:reports') // At least one permission required
   .needAll('write:reports', 'audit:log') // All permissions required
 ```
@@ -339,19 +335,18 @@ app.get('/data', authGuard(), async (c) => {
 ## Documentation
 
 - [Architecture](design/architecture.md) - System design and component overview
-- [API Design](api-design.md) - Complete API reference and examples
+- [API Design](design/api-design.md) - Complete API reference and examples
 - [JWT Integration](design/jwt-integration.md) - Token structure, configuration strategies, and patterns
 - **[Input Validation](guides/validation.md) - Security best practices for validating all input with Zod**
 - **[Structured Logging](guides/logging.md) - ADR-0013 compliant logging for polyglot microservices**
-- [Contributing](../CONTRIBUTING.md) - Development setup and guidelines
 
 ---
 
 ## Testing Tips
 
-* Run integration tests in Miniflare with `JWT_SECRET` or a stubbed resolver
-* Use `@chrislyons-dev/flarelette-jwt` CLI to generate 64-byte secrets for HS512
-* Mock the JWKS resolver in local tests:
+- Run integration tests in Miniflare with `JWT_SECRET` or a stubbed resolver
+- Use `@chrislyons-dev/flarelette-jwt` CLI to generate 64-byte secrets for HS512
+- Mock the JWKS resolver in local tests:
 
   ```typescript
   import { setJwksResolver } from '@chrislyons-dev/flarelette-jwt'
@@ -363,10 +358,10 @@ app.get('/data', authGuard(), async (c) => {
 
 ## Roadmap
 
-* [ ] Optional mTLS / Access integration for external JWKS
-* [ ] KV-backed replay store (`jti`)
-* [ ] Rich error handling hooks (`onUnauthorized`, `onForbidden`)
-* [ ] OpenAPI/Swagger integration
+- [ ] Optional mTLS / Access integration for external JWKS
+- [ ] KV-backed replay store (`jti`)
+- [ ] Rich error handling hooks (`onUnauthorized`, `onForbidden`)
+- [ ] OpenAPI/Swagger integration
 
 ---
 
@@ -375,18 +370,21 @@ app.get('/data', authGuard(), async (c) => {
 JWT authentication and input validation are critical security boundaries. This library prioritizes security over convenience:
 
 ### Authentication Security
+
 - **Fail securely**: Invalid tokens return `401`, insufficient permissions return `403`
 - **No detail leakage**: Error messages never expose token structure or validation details
 - **Short-lived tokens**: 5-15 minute TTL recommended
 - **Audience validation**: Prevents token reuse across services
 
 ### Input Validation Security
+
 - **Validate all input**: Every endpoint that accepts data must validate it
 - **Use Zod**: Type-safe runtime validation prevents injection attacks and type confusion
 - **Constrain everything**: String lengths, array sizes, numeric ranges, formats
 - **Never trust input**: Even from authenticated users
 
 ### Type Safety
+
 - **100% strict TypeScript**: No `any` types throughout the codebase
 - **Runtime + compile-time validation**: Zod provides both type inference and runtime checks
 - **Strong typing prevents vulnerabilities**: Type confusion and injection attacks are mitigated
@@ -397,7 +395,7 @@ See [JWT Integration Guide](design/jwt-integration.md) and [Input Validation Gui
 
 ## Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for:
+Contributions are welcome! Please see the CONTRIBUTING.md file in the repository root for:
 
 - Development setup
 - Code style guidelines (strict TypeScript, no `any`)

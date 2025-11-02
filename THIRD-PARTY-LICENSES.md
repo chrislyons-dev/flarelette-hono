@@ -409,6 +409,12 @@
 │  ├─ publisher: GitHub Inc.
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\abbrev
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\abbrev\LICENSE
+├─ abort-controller@3.0.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/mysticatea/abort-controller
+│  ├─ publisher: Toru Nagashima
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\abort-controller
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\abort-controller\LICENSE
 ├─ acorn-jsx@5.3.2
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/acornjs/acorn-jsx
@@ -526,6 +532,13 @@
 │  ├─ email: mail@juliangruber.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\balanced-match
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\balanced-match\LICENSE.md
+├─ base64-js@1.5.1
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/beatgammit/base64-js
+│  ├─ publisher: T. Jameson Little
+│  ├─ email: t.jameson.little@gmail.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\base64-js
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\base64-js\LICENSE
 ├─ blake3-wasm@2.1.5
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/connor4312/blake3
@@ -553,6 +566,13 @@
 │  ├─ publisher: Jon Schlinkert
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\braces
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\braces\LICENSE
+├─ buffer@6.0.3
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/feross/buffer
+│  ├─ publisher: Feross Aboukhadijeh
+│  ├─ email: feross@feross.org
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\buffer
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\buffer\LICENSE
 ├─ cac@6.7.14
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/egoist/cac
@@ -820,6 +840,19 @@
 │  ├─ repository: https://github.com/estools/esutils
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\esutils
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\esutils\LICENSE.BSD
+├─ event-target-shim@5.0.1
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/mysticatea/event-target-shim
+│  ├─ publisher: Toru Nagashima
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\event-target-shim
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\event-target-shim\LICENSE
+├─ events@3.3.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/Gozala/events
+│  ├─ publisher: Irakli Gozalishvili
+│  ├─ email: rfobic@gmail.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\events
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\events\LICENSE
 ├─ execa@8.0.1
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/sindresorhus/execa
@@ -878,6 +911,13 @@
 │  ├─ email: ram@hiddentao.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\fast-levenshtein
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\fast-levenshtein\LICENSE.md
+├─ fast-redact@3.5.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/davidmarkclements/fast-redact
+│  ├─ publisher: David Mark Clements
+│  ├─ email: david.clements@nearform.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\fast-redact
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\fast-redact\LICENSE
 ├─ fast-safe-stringify@2.1.1
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/davidmarkclements/fast-safe-stringify
@@ -1107,6 +1147,13 @@
 │  ├─ email: ehmicky@gmail.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\human-signals
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\human-signals\LICENSE
+├─ ieee754@1.2.1
+│  ├─ licenses: BSD-3-Clause
+│  ├─ repository: https://github.com/feross/ieee754
+│  ├─ publisher: Feross Aboukhadijeh
+│  ├─ email: feross@feross.org
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\ieee754
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\ieee754\LICENSE
 ├─ ignore@5.3.2
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/kaelzhang/node-ignore
@@ -1733,6 +1780,13 @@
 │  ├─ publisher: Jon Schlinkert
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\tinyglobby\node_modules\picomatch
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\tinyglobby\node_modules\picomatch\LICENSE
+├─ pino-abstract-transport@1.2.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/pinojs/pino-abstract-transport
+│  ├─ publisher: Matteo Collina
+│  ├─ email: hello@matteocollina.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\pino\node_modules\pino-abstract-transport
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\pino\node_modules\pino-abstract-transport\LICENSE
 ├─ pino-abstract-transport@2.0.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/pinojs/pino-abstract-transport
@@ -1747,14 +1801,28 @@
 │  ├─ email: james.sumners@gmail.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\pino-pretty
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\pino-pretty\LICENSE
-├─ pino-std-serializers@7.0.0
+├─ pino-std-serializers@6.2.2
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/pinojs/pino-std-serializers
 │  ├─ publisher: James Sumners
 │  ├─ email: james.sumners@gmail.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\pino-std-serializers
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\pino-std-serializers\LICENSE
+├─ pino-std-serializers@7.0.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/pinojs/pino-std-serializers
+│  ├─ publisher: James Sumners
+│  ├─ email: james.sumners@gmail.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\pino-std-serializers
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\pino-std-serializers\LICENSE
 ├─ pino@10.1.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/pinojs/pino
+│  ├─ publisher: Matteo Collina
+│  ├─ email: hello@matteocollina.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\pino
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\pino\LICENSE
+├─ pino@8.21.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/pinojs/pino
 │  ├─ publisher: Matteo Collina
@@ -1807,12 +1875,25 @@
 │  ├─ email: rocket.mind@gmail.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\printable-characters
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\printable-characters\LICENSE
-├─ process-warning@5.0.0
+├─ process-warning@3.0.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/fastify/process-warning
 │  ├─ publisher: Tomas Della Vedova
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\process-warning
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\process-warning\LICENSE
+├─ process-warning@5.0.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/fastify/process-warning
+│  ├─ publisher: Tomas Della Vedova
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\process-warning
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\process-warning\LICENSE
+├─ process@0.11.10
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/shtylman/node-process
+│  ├─ publisher: Roman Shtylman
+│  ├─ email: shtylman@gmail.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\process
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\process\LICENSE
 ├─ pump@3.0.3
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/mafintosh/pump
@@ -1857,6 +1938,11 @@
 │  ├─ publisher: GitHub Inc.
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\read-package-json
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\read-package-json\LICENSE
+├─ readable-stream@4.7.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/nodejs/readable-stream
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\readable-stream
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\readable-stream\LICENSE
 ├─ real-require@0.2.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/pinojs/real-require
@@ -1917,6 +2003,13 @@
 │  ├─ email: feross@feross.org
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\run-parallel
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\run-parallel\LICENSE
+├─ safe-buffer@5.2.1
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/feross/safe-buffer
+│  ├─ publisher: Feross Aboukhadijeh
+│  ├─ email: feross@feross.org
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\safe-buffer
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\safe-buffer\LICENSE
 ├─ safe-stable-stringify@2.5.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/BridgeAR/safe-stable-stringify
@@ -2005,6 +2098,13 @@
 │  ├─ email: cyyynthia@borkenware.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\smol-toml
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\smol-toml\LICENSE
+├─ sonic-boom@3.8.1
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/pinojs/sonic-boom
+│  ├─ publisher: Matteo Collina
+│  ├─ email: hello@matteocollina.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\pino\node_modules\sonic-boom
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\pino\node_modules\sonic-boom\LICENSE
 ├─ sonic-boom@4.2.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/pinojs/sonic-boom
@@ -2121,6 +2221,11 @@
 │  ├─ email: sindresorhus@gmail.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\string-width
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\string-width\license
+├─ string_decoder@1.3.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/nodejs/string_decoder
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\string_decoder
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\string_decoder\LICENSE
 ├─ strip-ansi@6.0.1
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/chalk/strip-ansi
@@ -2191,13 +2296,20 @@
 │  ├─ email: mail@substack.net
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\text-table
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\text-table\LICENSE
-├─ thread-stream@3.1.0
+├─ thread-stream@2.7.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/mcollina/thread-stream
 │  ├─ publisher: Matteo Collina
 │  ├─ email: hello@matteocollina.com
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\thread-stream
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\thread-stream\LICENSE
+├─ thread-stream@3.1.0
+│  ├─ licenses: MIT
+│  ├─ repository: https://github.com/mcollina/thread-stream
+│  ├─ publisher: Matteo Collina
+│  ├─ email: hello@matteocollina.com
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\thread-stream
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\node_modules\thread-stream\LICENSE
 ├─ tinybench@2.9.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/tinylibs/tinybench

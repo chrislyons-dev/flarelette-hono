@@ -1,3 +1,3 @@
 # Code Style
 
-Coming soon - see [CONTRIBUTING.md](../../CONTRIBUTING.md) for code style guidelines.
+Coming soon - see `CONTRIBUTING.md` in the repository root for code style guidelines.
