@@ -42,6 +42,45 @@ export interface LoggerOptions {
 }
 
 /**
+ * Format log level as string (ADR-0013 requirement)
+ *
+ * Pino formats levels as numbers by default, but ADR-0013 requires string levels.
+ *
+ * @param label - Log level label (e.g., 'info', 'error')
+ * @returns Formatted level object
+ * @internal
+ */
+export function formatLevel(label: string): { level: string } {
+  return { level: label }
+}
+
+/**
+ * Generate ISO 8601 timestamp for logs (ADR-0013 requirement)
+ *
+ * Returns current timestamp in ISO 8601 format with milliseconds,
+ * formatted as a JSON fragment for Pino.
+ *
+ * @returns Formatted timestamp string
+ * @internal
+ */
+export function generateTimestamp(): string {
+  return `,"timestamp":"${new Date().toISOString()}"`
+}
+
+/**
+ * Request ID extractor for correlation (ADR-0013 requirement)
+ *
+ * Returns undefined to let hono-pino automatically extract X-Request-ID header.
+ * This enables distributed tracing across service boundaries.
+ *
+ * @returns Always undefined (handled by hono-pino)
+ * @internal
+ */
+export function extractRequestId(): undefined {
+  return undefined
+}
+
+/**
  * Create ADR-0013 compliant structured logger
  *
  * Returns a Hono middleware that automatically logs request start/completion
@@ -136,21 +175,18 @@ export function createLogger(options: LoggerOptions): MiddlewareHandler {
 
       // Format level as string (not number)
       formatters: {
-        level: (label: string) => ({ level: label }),
+        level: formatLevel,
       },
 
       // ISO 8601 timestamp with milliseconds
-      timestamp: () => `,"timestamp":"${new Date().toISOString()}"`,
+      timestamp: generateTimestamp,
     }),
 
     // Extract X-Request-ID header for request correlation
     http: {
       // Request ID is automatically extracted from X-Request-ID header
       // and included in all logs for this request
-      reqId: () => {
-        // This is handled by hono-pino automatically via the request headers
-        return undefined
-      },
+      reqId: extractRequestId,
     },
   })
 }

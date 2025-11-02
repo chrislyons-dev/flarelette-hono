@@ -37,6 +37,21 @@ workspace "flarelette-hono" "Type-safe JWT authentication middleware for Hono on
                 }
 
                 # Code elements (classes, functions)
+                chrislyons_dev_flarelette_hono__logging__formatlevel = component "logging.formatLevel" {
+                    description "Format log level as string (ADR-0013 requirement) Pino formats levels as numbers by default, but ADR-0013 requires string levels."
+                    technology "function"
+                    tags "Code"
+                }
+                chrislyons_dev_flarelette_hono__logging__generatetimestamp = component "logging.generateTimestamp" {
+                    description "Generate ISO 8601 timestamp for logs (ADR-0013 requirement) Returns current timestamp in ISO 8601 format with milliseconds, formatted as a JSON fragment for Pino."
+                    technology "function"
+                    tags "Code"
+                }
+                chrislyons_dev_flarelette_hono__logging__extractrequestid = component "logging.extractRequestId" {
+                    description "Request ID extractor for correlation (ADR-0013 requirement) Returns undefined to let hono-pino automatically extract X-Request-ID header. This enables distributed tracing across service boundaries."
+                    technology "function"
+                    tags "Code"
+                }
                 chrislyons_dev_flarelette_hono__logging__createlogger = component "logging.createLogger" {
                     description "Create ADR-0013 compliant structured logger Returns a Hono middleware that automatically logs request start/completion and provides a structured logger instance in the context. **ADR-0013 Schema:** ```json { \"timestamp\": \"2025-11-02T12:34:56.789Z\", \"level\": \"info\", \"service\": \"bond-valuation\", \"requestId\": \"uuid-v4\", \"message\": \"Request completed\", \"duration\": 125, \"method\": \"POST\", \"path\": \"/api/price\", \"status\": 200 } ``` **Request Correlation:** The logger automatically extracts and propagates `X-Request-ID` header for distributed tracing across service boundaries."
                     technology "function"
@@ -351,6 +366,9 @@ branding {
 
 
         component chrislyons_dev_flarelette_hono "Classes_chrislyons_dev_flarelette_hono__logging" {
+            include chrislyons_dev_flarelette_hono__logging__formatlevel
+            include chrislyons_dev_flarelette_hono__logging__generatetimestamp
+            include chrislyons_dev_flarelette_hono__logging__extractrequestid
             include chrislyons_dev_flarelette_hono__logging__createlogger
             autoLayout
         }

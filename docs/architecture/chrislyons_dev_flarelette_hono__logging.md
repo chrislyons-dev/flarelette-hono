@@ -42,12 +42,106 @@ for polyglot microservice consistency.</td>
 ### Code Elements
 
 <details>
-<summary><strong>1 code element(s)</strong></summary>
+<summary><strong>4 code element(s)</strong></summary>
 
 
 
 #### Functions
 
+##### `formatLevel()`
+
+Format log level as string (ADR-0013 requirement)
+
+Pino formats levels as numbers by default, but ADR-0013 requires string levels.
+
+<table>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>function</code></td>
+</tr>
+<tr>
+<td><strong>Visibility</strong></td>
+<td><code>public</code></td>
+</tr>
+<tr>
+<td><strong>Returns</strong></td>
+<td><code>{ level: string; }</code> — Formatted level object</td>
+</tr>
+<tr>
+<td><strong>Location</strong></td>
+<td><code>C:/Users/chris/git/flarelette-hono/src/logging.ts:53</code></td>
+</tr>
+</tbody>
+</table>
+
+**Parameters:**
+
+- `label`: <code>string</code> — - Log level label (e.g., 'info', 'error')
+
+---
+##### `generateTimestamp()`
+
+Generate ISO 8601 timestamp for logs (ADR-0013 requirement)
+
+Returns current timestamp in ISO 8601 format with milliseconds,
+formatted as a JSON fragment for Pino.
+
+<table>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>function</code></td>
+</tr>
+<tr>
+<td><strong>Visibility</strong></td>
+<td><code>public</code></td>
+</tr>
+<tr>
+<td><strong>Returns</strong></td>
+<td><code>string</code> — Formatted timestamp string</td>
+</tr>
+<tr>
+<td><strong>Location</strong></td>
+<td><code>C:/Users/chris/git/flarelette-hono/src/logging.ts:66</code></td>
+</tr>
+</tbody>
+</table>
+
+
+
+---
+##### `extractRequestId()`
+
+Request ID extractor for correlation (ADR-0013 requirement)
+
+Returns undefined to let hono-pino automatically extract X-Request-ID header.
+This enables distributed tracing across service boundaries.
+
+<table>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>function</code></td>
+</tr>
+<tr>
+<td><strong>Visibility</strong></td>
+<td><code>public</code></td>
+</tr>
+<tr>
+<td><strong>Returns</strong></td>
+<td><code>undefined</code> — Always undefined (handled by hono-pino)</td>
+</tr>
+<tr>
+<td><strong>Location</strong></td>
+<td><code>C:/Users/chris/git/flarelette-hono/src/logging.ts:79</code></td>
+</tr>
+</tbody>
+</table>
+
+
+
+---
 ##### `createLogger()`
 
 Create ADR-0013 compliant structured logger
@@ -90,7 +184,7 @@ for distributed tracing across service boundaries.
 </tr>
 <tr>
 <td><strong>Location</strong></td>
-<td><code>C:/Users/chris/git/flarelette-hono/src/logging.ts:106</code></td>
+<td><code>C:/Users/chris/git/flarelette-hono/src/logging.ts:145</code></td>
 </tr>
 </tbody>
 </table>

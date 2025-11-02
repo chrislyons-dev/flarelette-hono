@@ -26,7 +26,7 @@
     "lint": "eslint src tests",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "check": "npm run lint && npm run licenses:generate && npm run archlette && npm run format && npm run type-check && npm run test",
+    "check": "npm run lint && npm run licenses:generate && npm run archlette && npm run format && npm run type-check && npm run test:coverage",
     "licenses:generate": "npx license-checker-rseidelsohn --out THIRD-PARTY-LICENSES.md",
     "docs:build": "mkdocs build",
     "docs:serve": "mkdocs serve",

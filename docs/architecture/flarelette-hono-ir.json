@@ -77,6 +77,64 @@
   ],
   "code": [
     {
+      "description": "Format log level as string (ADR-0013 requirement)\n\nPino formats levels as numbers by default, but ADR-0013 requires string levels.",
+      "id": "chrislyons_dev_flarelette_hono__logging__formatlevel",
+      "componentId": "chrislyons_dev_flarelette_hono__logging",
+      "name": "formatLevel",
+      "type": "function",
+      "documentation": {
+        "summary": "Format log level as string (ADR-0013 requirement)\n\nPino formats levels as numbers by default, but ADR-0013 requires string levels."
+      },
+      "returnType": "{ level: string; }",
+      "returnDescription": "Formatted level object",
+      "parameters": [
+        {
+          "name": "label",
+          "type": "string",
+          "description": "- Log level label (e.g., 'info', 'error')",
+          "optional": false
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "lineNumber": 53
+    },
+    {
+      "description": "Generate ISO 8601 timestamp for logs (ADR-0013 requirement)\n\nReturns current timestamp in ISO 8601 format with milliseconds,\nformatted as a JSON fragment for Pino.",
+      "id": "chrislyons_dev_flarelette_hono__logging__generatetimestamp",
+      "componentId": "chrislyons_dev_flarelette_hono__logging",
+      "name": "generateTimestamp",
+      "type": "function",
+      "documentation": {
+        "summary": "Generate ISO 8601 timestamp for logs (ADR-0013 requirement)\n\nReturns current timestamp in ISO 8601 format with milliseconds,\nformatted as a JSON fragment for Pino."
+      },
+      "returnType": "string",
+      "returnDescription": "Formatted timestamp string",
+      "parameters": [],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "lineNumber": 66
+    },
+    {
+      "description": "Request ID extractor for correlation (ADR-0013 requirement)\n\nReturns undefined to let hono-pino automatically extract X-Request-ID header.\nThis enables distributed tracing across service boundaries.",
+      "id": "chrislyons_dev_flarelette_hono__logging__extractrequestid",
+      "componentId": "chrislyons_dev_flarelette_hono__logging",
+      "name": "extractRequestId",
+      "type": "function",
+      "documentation": {
+        "summary": "Request ID extractor for correlation (ADR-0013 requirement)\n\nReturns undefined to let hono-pino automatically extract X-Request-ID header.\nThis enables distributed tracing across service boundaries."
+      },
+      "returnType": "undefined",
+      "returnDescription": "Always undefined (handled by hono-pino)",
+      "parameters": [],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "lineNumber": 79
+    },
+    {
       "description": "Create ADR-0013 compliant structured logger\n\nReturns a Hono middleware that automatically logs request start/completion\nand provides a structured logger instance in the context.\n\n**ADR-0013 Schema:**\n```json\n{\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\n  \"level\": \"info\",\n  \"service\": \"bond-valuation\",\n  \"requestId\": \"uuid-v4\",\n  \"message\": \"Request completed\",\n  \"duration\": 125,\n  \"method\": \"POST\",\n  \"path\": \"/api/price\",\n  \"status\": 200\n}\n```\n\n**Request Correlation:**\nThe logger automatically extracts and propagates `X-Request-ID` header\nfor distributed tracing across service boundaries.",
       "id": "chrislyons_dev_flarelette_hono__logging__createlogger",
       "componentId": "chrislyons_dev_flarelette_hono__logging",
@@ -102,7 +160,7 @@
       "visibility": "public",
       "isAsync": false,
       "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
-      "lineNumber": 106
+      "lineNumber": 145
     },
     {
       "description": "Extract Bearer token from Authorization header",
