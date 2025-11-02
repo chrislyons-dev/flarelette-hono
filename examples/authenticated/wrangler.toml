@@ -1,0 +1,33 @@
+name = "flarelette-hono-authenticated"
+main = "index.ts"
+compatibility_date = "2024-01-01"
+
+# Environment variables for JWT configuration
+# IMPORTANT: In production, use Cloudflare Workers Secrets instead of environment variables
+
+[vars]
+JWT_ISS = "https://your-issuer.example.com"
+JWT_AUD = "your-service-id"
+JWT_TTL_SECONDS = "900"  # 15 minutes
+JWT_LEEWAY = "60"        # 60 seconds clock tolerance
+
+# For production, use EdDSA instead of HS512:
+#
+# 1. Generate Ed25519 key pair:
+#    npx wrangler secret put JWT_PRIVATE_JWK_NAME
+#    npx wrangler secret put JWT_PUBLIC_JWK_NAME
+#
+# 2. Set as service binding for JWKS (recommended for key rotation):
+#    [[services]]
+#    binding = "JWKS_SERVICE"
+#    service = "your-jwks-service"
+#
+#    Then set:
+#    JWT_JWKS_SERVICE_NAME = "JWKS_SERVICE"
+
+# IMPORTANT: Never commit secrets to version control!
+# Set JWT_SECRET as a Cloudflare Workers secret:
+#
+#   npx wrangler secret put JWT_SECRET
+#
+# Generate with: node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"

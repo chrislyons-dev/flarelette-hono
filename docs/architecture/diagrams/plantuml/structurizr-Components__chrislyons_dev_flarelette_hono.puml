@@ -1,0 +1,64 @@
+@startuml
+set separator none
+title flarelette-hono - @chrislyons-dev/flarelette-hono - Components
+
+top to bottom direction
+skinparam ranksep 60
+skinparam nodesep 30
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  defaultFontName "Arial"
+}
+
+hide stereotype
+
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.main>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.middleware>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilder>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.types>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono>> {
+  BorderColor #2e6295
+  FontColor #2e6295
+  shadowing false
+}
+
+rectangle "@chrislyons-dev/flarelette-hono\n<size:10>[Container: Service]</size>" <<flarelettehono.chrislyonsdevflarelettehono>> {
+  rectangle "==main\n<size:10>[Component: module]</size>\n\nflarelette-hono - Type-safe JWT authentication middleware for Hono Framework adapter for Cloudflare Workers built on Hono + Flarelette JWT. Provides declarative JWT authentication and policy enforcement." <<flarelettehono.chrislyonsdevflarelettehono.main>> as flarelettehono.chrislyonsdevflarelettehono.main
+  rectangle "==middleware\n<size:10>[Component: module]</size>\n\nAuthentication middleware for Hono Provides JWT authentication and authorization for Hono applications on Cloudflare Workers." <<flarelettehono.chrislyonsdevflarelettehono.middleware>> as flarelettehono.chrislyonsdevflarelettehono.middleware
+  rectangle "==policy-builder\n<size:10>[Component: module]</size>\n\nPolicy builder for declarative JWT authorization Provides fluent API for constructing authorization policies based on JWT claims." <<flarelettehono.chrislyonsdevflarelettehono.policybuilder>> as flarelettehono.chrislyonsdevflarelettehono.policybuilder
+  rectangle "==types\n<size:10>[Component: module]</size>\n\nType definitions for flarelette-hono Re-exports types from" <<flarelettehono.chrislyonsdevflarelettehono.types>> as flarelettehono.chrislyonsdevflarelettehono.types
+}
+
+flarelettehono.chrislyonsdevflarelettehono.main -[#707070,thickness=2]-> flarelettehono.chrislyonsdevflarelettehono.middleware : "<color:#707070>authentication middleware"
+flarelettehono.chrislyonsdevflarelettehono.main -[#707070,thickness=2]-> flarelettehono.chrislyonsdevflarelettehono.policybuilder : "<color:#707070>policy builder"
+flarelettehono.chrislyonsdevflarelettehono.middleware -[#707070,thickness=2]-> flarelettehono.chrislyonsdevflarelettehono.types : "<color:#707070>environment and policy types"
+flarelettehono.chrislyonsdevflarelettehono.policybuilder -[#707070,thickness=2]-> flarelettehono.chrislyonsdevflarelettehono.types : "<color:#707070>policy types"
+@enduml

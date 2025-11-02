@@ -1,0 +1,140 @@
+@startuml
+set separator none
+title flarelette-hono - @chrislyons-dev/flarelette-hono - Components
+
+top to bottom direction
+skinparam ranksep 60
+skinparam nodesep 30
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  defaultFontName "Arial"
+}
+
+hide stereotype
+
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImpl>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplbuild>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAll>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAny>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplrolesAll>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplrolesAny>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImpl>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluate>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateNeedAll>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateNeedAny>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRolesAll>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRolesAny>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRule>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.policybuilderpolicy>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono>> {
+  BorderColor #2e6295
+  FontColor #2e6295
+  shadowing false
+}
+
+rectangle "@chrislyons-dev/flarelette-hono\n<size:10>[Container: Service]</size>" <<flarelettehono.chrislyonsdevflarelettehono>> {
+  rectangle "==policy-builder.PolicyImpl\n<size:10>[Component: class]</size>\n\nConcrete policy implementation Evaluates rules against JWT payload to determine access." <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImpl>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImpl
+  rectangle "==policy-builder.PolicyImpl.evaluate\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluate>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluate
+  rectangle "==policy-builder.PolicyImpl.evaluateRule\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRule>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRule
+  rectangle "==policy-builder.PolicyImpl.evaluateRolesAny\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRolesAny>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRolesAny
+  rectangle "==policy-builder.PolicyImpl.evaluateRolesAll\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRolesAll>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRolesAll
+  rectangle "==policy-builder.PolicyImpl.evaluateNeedAny\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateNeedAny>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateNeedAny
+  rectangle "==policy-builder.PolicyImpl.evaluateNeedAll\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateNeedAll>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateNeedAll
+  rectangle "==policy-builder.PolicyBuilderImpl\n<size:10>[Component: class]</size>\n\nPolicy builder implementation Fluent API for constructing authorization policies." <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImpl>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImpl
+  rectangle "==policy-builder.PolicyBuilderImpl.rolesAny\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplrolesAny>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplrolesAny
+  rectangle "==policy-builder.PolicyBuilderImpl.rolesAll\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplrolesAll>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplrolesAll
+  rectangle "==policy-builder.PolicyBuilderImpl.needAny\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAny>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAny
+  rectangle "==policy-builder.PolicyBuilderImpl.needAll\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAll>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAll
+  rectangle "==policy-builder.PolicyBuilderImpl.build\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplbuild>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplbuild
+  rectangle "==policy-builder.policy\n<size:10>[Component: function]</size>\n\nCreate a new policy builder" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderpolicy>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderpolicy
+}
+
+@enduml
