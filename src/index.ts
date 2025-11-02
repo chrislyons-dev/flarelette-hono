@@ -32,6 +32,7 @@
  * @module main
  * @uses middleware authentication middleware
  * @uses policy-builder policy builder
+ * @uses logging structured logging middleware
  *
  */
 
@@ -40,6 +41,10 @@ export { authGuard } from './middleware.js'
 
 // Policy builder
 export { policy } from './policy.js'
+
+// Structured logging (optional - requires hono-pino + pino)
+export { createLogger } from './logging.js'
+export type { Logger, LoggerOptions } from './logging.js'
 
 // Type exports
 export type {

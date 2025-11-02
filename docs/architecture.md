@@ -20,6 +20,42 @@ Flarelette-Hono is a type-safe, security-first authentication and authorization 
 
 ---
 
+## Scope and Philosophy
+
+**Flarelette-Hono is an auth middleware for Hono, not a framework replacement.**
+
+### Comparison to Python Flarelette
+
+| Aspect | Python `flarelette` | TypeScript `flarelette-hono` |
+|--------|---------------------|------------------------------|
+| **Scope** | Full micro-framework | Auth middleware only |
+| **Base Framework** | Custom (similar to Flask/Starlette) | Hono (existing framework) |
+| **Routing** | Provides routing | Uses Hono's router |
+| **Middleware** | Custom middleware system | Uses Hono's middleware |
+| **Auth** | Built-in JWT auth | ✅ Provides via `authGuard()` |
+| **Validation** | Built-in `Field` validators | Recommends Zod + `@hono/zod-validator` |
+| **Logging** | Built-in `StructuredLogger` | ✅ Optional `createLogger()` helper |
+| **Error Handling** | Custom error classes | Uses Hono's error handling |
+| **Service Factory** | `create_worker_app()` | N/A - compose manually with Hono |
+
+### Design Decision: Why Not Rewrite Hono?
+
+Hono is already a mature, well-designed framework optimized for edge runtimes. Rewriting it would:
+- ❌ Duplicate effort
+- ❌ Fragment the ecosystem
+- ❌ Increase maintenance burden
+- ❌ Force users to choose between frameworks
+
+Instead, `flarelette-hono` **extends** Hono with the specific features needed for polyglot microservice consistency:
+- ✅ JWT authentication following same patterns as Python
+- ✅ Policy-based authorization
+- ✅ ADR-0013 compliant structured logging (optional)
+- ✅ Shared security standards across languages
+
+**Principle**: Add what's missing, leverage what exists.
+
+---
+
 ## Design Principles
 
 ### 1. Security First

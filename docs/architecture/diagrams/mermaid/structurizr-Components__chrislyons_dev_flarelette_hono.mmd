@@ -9,16 +9,19 @@ graph TB
 
       3("<div style='font-weight: bold'>main</div><div style='font-size: 70%; margin-top: 0px'>[Component: module]</div><div style='font-size: 80%; margin-top:10px'>flarelette-hono - Type-safe<br />JWT authentication middleware<br />for Hono Framework adapter<br />for Cloudflare Workers built<br />on Hono + Flarelette JWT.<br />Provides declarative JWT<br />authentication and policy<br />enforcement.</div>")
       style 3 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      4("<div style='font-weight: bold'>middleware</div><div style='font-size: 70%; margin-top: 0px'>[Component: module]</div><div style='font-size: 80%; margin-top:10px'>Authentication middleware for<br />Hono Provides JWT<br />authentication and<br />authorization for Hono<br />applications on Cloudflare<br />Workers.</div>")
+      4("<div style='font-weight: bold'>logging</div><div style='font-size: 70%; margin-top: 0px'>[Component: module]</div><div style='font-size: 80%; margin-top:10px'>Structured logging for Hono<br />applications Provides<br />ADR-0013 compliant structured<br />logging using hono-pino. This<br />is a thin wrapper that<br />configures pino with the<br />correct schema for polyglot<br />microservice consistency.</div>")
       style 4 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      5("<div style='font-weight: bold'>policy-builder</div><div style='font-size: 70%; margin-top: 0px'>[Component: module]</div><div style='font-size: 80%; margin-top:10px'>Policy builder for<br />declarative JWT authorization<br />Provides fluent API for<br />constructing authorization<br />policies based on JWT claims.</div>")
+      5("<div style='font-weight: bold'>middleware</div><div style='font-size: 70%; margin-top: 0px'>[Component: module]</div><div style='font-size: 80%; margin-top:10px'>Authentication middleware for<br />Hono Provides JWT<br />authentication and<br />authorization for Hono<br />applications on Cloudflare<br />Workers.</div>")
       style 5 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      6("<div style='font-weight: bold'>types</div><div style='font-size: 70%; margin-top: 0px'>[Component: module]</div><div style='font-size: 80%; margin-top:10px'>Type definitions for<br />flarelette-hono Re-exports<br />types from</div>")
+      6("<div style='font-weight: bold'>policy-builder</div><div style='font-size: 70%; margin-top: 0px'>[Component: module]</div><div style='font-size: 80%; margin-top:10px'>Policy builder for<br />declarative JWT authorization<br />Provides fluent API for<br />constructing authorization<br />policies based on JWT claims.</div>")
       style 6 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      7("<div style='font-weight: bold'>types</div><div style='font-size: 70%; margin-top: 0px'>[Component: module]</div><div style='font-size: 80%; margin-top:10px'>Type definitions for<br />flarelette-hono Re-exports<br />types from</div>")
+      style 7 fill:#85bbf0,stroke:#5d82a8,color:#000000
     end
 
-    3-- "<div>authentication middleware</div><div style='font-size: 70%'></div>" -->4
-    3-- "<div>policy builder</div><div style='font-size: 70%'></div>" -->5
-    4-- "<div>environment and policy types</div><div style='font-size: 70%'></div>" -->6
-    5-- "<div>policy types</div><div style='font-size: 70%'></div>" -->6
+    3-- "<div>authentication middleware</div><div style='font-size: 70%'></div>" -->5
+    3-- "<div>policy builder</div><div style='font-size: 70%'></div>" -->6
+    3-- "<div>structured logging middleware</div><div style='font-size: 70%'></div>" -->4
+    5-- "<div>environment and policy types</div><div style='font-size: 70%'></div>" -->7
+    6-- "<div>policy types</div><div style='font-size: 70%'></div>" -->7
   end

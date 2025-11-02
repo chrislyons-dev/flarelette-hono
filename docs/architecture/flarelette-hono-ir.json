@@ -47,6 +47,13 @@
       "type": "module"
     },
     {
+      "description": "Structured logging for Hono applications\n\nProvides ADR-0013 compliant structured logging using hono-pino.\nThis is a thin wrapper that configures pino with the correct schema\nfor polyglot microservice consistency.",
+      "id": "chrislyons_dev_flarelette_hono__logging",
+      "containerId": "chrislyons_dev_flarelette_hono",
+      "name": "logging",
+      "type": "module"
+    },
+    {
       "description": "Authentication middleware for Hono\n\nProvides JWT authentication and authorization for Hono applications on Cloudflare Workers.",
       "id": "chrislyons_dev_flarelette_hono__middleware",
       "containerId": "chrislyons_dev_flarelette_hono",
@@ -69,6 +76,34 @@
     }
   ],
   "code": [
+    {
+      "description": "Create ADR-0013 compliant structured logger\n\nReturns a Hono middleware that automatically logs request start/completion\nand provides a structured logger instance in the context.\n\n**ADR-0013 Schema:**\n```json\n{\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\n  \"level\": \"info\",\n  \"service\": \"bond-valuation\",\n  \"requestId\": \"uuid-v4\",\n  \"message\": \"Request completed\",\n  \"duration\": 125,\n  \"method\": \"POST\",\n  \"path\": \"/api/price\",\n  \"status\": 200\n}\n```\n\n**Request Correlation:**\nThe logger automatically extracts and propagates `X-Request-ID` header\nfor distributed tracing across service boundaries.",
+      "id": "chrislyons_dev_flarelette_hono__logging__createlogger",
+      "componentId": "chrislyons_dev_flarelette_hono__logging",
+      "name": "createLogger",
+      "type": "function",
+      "documentation": {
+        "summary": "Create ADR-0013 compliant structured logger\n\nReturns a Hono middleware that automatically logs request start/completion\nand provides a structured logger instance in the context.\n\n**ADR-0013 Schema:**\n```json\n{\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\n  \"level\": \"info\",\n  \"service\": \"bond-valuation\",\n  \"requestId\": \"uuid-v4\",\n  \"message\": \"Request completed\",\n  \"duration\": 125,\n  \"method\": \"POST\",\n  \"path\": \"/api/price\",\n  \"status\": 200\n}\n```\n\n**Request Correlation:**\nThe logger automatically extracts and propagates `X-Request-ID` header\nfor distributed tracing across service boundaries.",
+        "examples": [
+          "```typescript\nimport { Hono } from 'hono'\nimport { createLogger } from '@chrislyons-dev/flarelette-hono'\n\nconst app = new Hono()\n\n// Add structured logging middleware\napp.use('*', createLogger({ service: 'bond-valuation' }))\n\napp.get('/price', async (c) => {\n  // Access logger from context\n  c.get('logger').info({ calculation: 'started' }, 'Calculating bond price')\n  return c.json({ price: 99.948 })\n})\n```",
+          "```typescript\n// Combine with auth middleware\napp.use('*', createLogger({ service: 'my-service' }))\napp.use('*', authGuard())\n\napp.post('/data', async (c) => {\n  const logger = c.get('logger')\n  const auth = c.get('auth')\n\n  logger.info({ userId: auth.sub }, 'Processing request')\n  return c.json({ ok: true })\n})\n```"
+        ]
+      },
+      "returnType": "MiddlewareHandler",
+      "returnDescription": "Hono middleware for structured logging",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "import(\"C:/Users/chris/git/flarelette-hono/src/logging\").LoggerOptions",
+          "description": "- Logger configuration",
+          "optional": false
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "lineNumber": 106
+    },
     {
       "description": "Extract Bearer token from Authorization header",
       "id": "chrislyons_dev_flarelette_hono__middleware__extractbearertoken",
@@ -467,6 +502,18 @@
       "destination": "chrislyons_dev_flarelette_hono__policy_builder"
     },
     {
+      "description": "structured logging middleware",
+      "tags": [],
+      "source": "chrislyons_dev_flarelette_hono__main",
+      "destination": "chrislyons_dev_flarelette_hono__logging"
+    },
+    {
+      "description": "imports MiddlewareHandler",
+      "source": "chrislyons_dev_flarelette_hono__logging",
+      "destination": "hono",
+      "stereotype": "type-import"
+    },
+    {
       "description": "environment and policy types",
       "tags": [],
       "source": "chrislyons_dev_flarelette_hono__middleware",
@@ -510,6 +557,12 @@
     }
   ],
   "codeRelationships": [
+    {
+      "description": "imports MiddlewareHandler",
+      "source": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "destination": "hono:MiddlewareHandler",
+      "stereotype": "type-import"
+    },
     {
       "description": "imports Context",
       "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",

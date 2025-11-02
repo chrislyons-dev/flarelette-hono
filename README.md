@@ -22,6 +22,28 @@ It adds route-level middleware, context helpers, and environment injection for a
 
 ---
 
+## Design Philosophy
+
+**Flarelette-Hono is an auth middleware for Hono, not a full framework.**
+
+Unlike the Python `flarelette` package (which is a complete micro-framework similar to Flask), `flarelette-hono` is **intentionally minimal**:
+
+- **Python flarelette**: Full framework (routing, middleware, auth, validation, logging, service factory)
+- **TypeScript flarelette-hono**: Auth middleware for existing Hono framework (JWT auth + optional logging helper)
+
+**Why this approach?**
+
+Hono is already an excellent edge framework — we don't rewrite it. Instead, `flarelette-hono` adds what's missing for feature compatibility with Python flarelette:
+
+✅ **JWT authentication** via `authGuard()` middleware
+✅ **Policy-based authorization** via `policy()` builder
+✅ **Structured logging** via optional `createLogger()` helper (ADR-0013 compliance)
+✅ **Type-safe context** via `HonoEnv` extension
+
+Everything else (routing, error handling, request/response, middleware chaining) is **Hono's responsibility**.
+
+---
+
 ## Features
 
 - **Framework-native**: integrates seamlessly with [Hono](https://hono.dev) on Cloudflare Workers
@@ -148,7 +170,55 @@ app.post(
 
 **See [Input Validation Guide](docs/validation.md) for complete security best practices.**
 
-### 6. Test Your Setup
+### 6. Structured Logging (Optional, Recommended for Production)
+
+**Structured logging ensures consistency across polyglot microservices** (ADR-0013 compliance).
+
+Install logging dependencies:
+
+```bash
+npm install hono-pino pino
+```
+
+Add structured logging middleware:
+
+```typescript
+import { createLogger } from '@chrislyons-dev/flarelette-hono'
+
+// Add logging middleware (before auth)
+app.use('*', createLogger({ service: 'bond-valuation' }))
+app.use('*', authGuard())
+
+app.post('/calculate', async (c) => {
+  const logger = c.get('logger')
+  const auth = c.get('auth')
+
+  // Structured logging with context
+  logger.info(
+    { userId: auth.sub, operation: 'calculate' },
+    'Processing calculation'
+  )
+
+  return c.json({ result: 42 })
+})
+```
+
+**Output (JSON):**
+```json
+{
+  "timestamp": "2025-11-02T12:34:56.789Z",
+  "level": "info",
+  "service": "bond-valuation",
+  "requestId": "a3f2c1b0-1234-5678-9abc",
+  "userId": "auth0|123",
+  "operation": "calculate",
+  "msg": "Processing calculation"
+}
+```
+
+**See [Structured Logging Guide](docs/logging.md) for ADR-0013 standards and best practices.**
+
+### 7. Test Your Setup
 
 Start development server:
 
@@ -166,7 +236,7 @@ curl http://localhost:8787/protected
 # (See examples/ directory for token generation utilities)
 ```
 
-### 7. Wrangler Config Example
+### 8. Wrangler Config Example
 
 ```toml
 name = "bond-consumer"
@@ -272,6 +342,7 @@ app.get('/data', authGuard(), async (c) => {
 - [API Design](docs/api-design.md) - Complete API reference and examples
 - [JWT Integration](docs/jwt-integration.md) - Token structure, configuration strategies, and patterns
 - **[Input Validation](docs/validation.md) - Security best practices for validating all input with Zod**
+- **[Structured Logging](docs/logging.md) - ADR-0013 compliant logging for polyglot microservices**
 - [Contributing](CONTRIBUTING.md) - Development setup and guidelines
 
 ---

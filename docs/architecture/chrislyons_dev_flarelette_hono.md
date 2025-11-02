@@ -64,6 +64,16 @@ Provides declarative JWT authentication and policy enforcement.</td>
 <td><a href="./chrislyons_dev_flarelette_hono__main.md">View →</a></td>
 </tr>
 <tr>
+<td><strong>logging</strong></td>
+<td><code>module</code></td>
+<td>Structured logging for Hono applications
+
+Provides ADR-0013 compliant structured logging using hono-pino.
+This is a thin wrapper that configures pino with the correct schema
+for polyglot microservice consistency.</td>
+<td><a href="./chrislyons_dev_flarelette_hono__logging.md">View →</a></td>
+</tr>
+<tr>
 <td><strong>middleware</strong></td>
 <td><code>module</code></td>
 <td>Authentication middleware for Hono

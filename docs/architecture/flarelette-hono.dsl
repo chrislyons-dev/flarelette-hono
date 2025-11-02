@@ -19,6 +19,10 @@ workspace "flarelette-hono" "Type-safe JWT authentication middleware for Hono on
                     description "flarelette-hono - Type-safe JWT authentication middleware for Hono Framework adapter for Cloudflare Workers built on Hono + Flarelette JWT. Provides declarative JWT authentication and policy enforcement."
                     technology "module"
                 }
+                chrislyons_dev_flarelette_hono__logging = component "logging" {
+                    description "Structured logging for Hono applications Provides ADR-0013 compliant structured logging using hono-pino. This is a thin wrapper that configures pino with the correct schema for polyglot microservice consistency."
+                    technology "module"
+                }
                 chrislyons_dev_flarelette_hono__middleware = component "middleware" {
                     description "Authentication middleware for Hono Provides JWT authentication and authorization for Hono applications on Cloudflare Workers."
                     technology "module"
@@ -33,6 +37,11 @@ workspace "flarelette-hono" "Type-safe JWT authentication middleware for Hono on
                 }
 
                 # Code elements (classes, functions)
+                chrislyons_dev_flarelette_hono__logging__createlogger = component "logging.createLogger" {
+                    description "Create ADR-0013 compliant structured logger Returns a Hono middleware that automatically logs request start/completion and provides a structured logger instance in the context. **ADR-0013 Schema:** ```json { \"timestamp\": \"2025-11-02T12:34:56.789Z\", \"level\": \"info\", \"service\": \"bond-valuation\", \"requestId\": \"uuid-v4\", \"message\": \"Request completed\", \"duration\": 125, \"method\": \"POST\", \"path\": \"/api/price\", \"status\": 200 } ``` **Request Correlation:** The logger automatically extracts and propagates `X-Request-ID` header for distributed tracing across service boundaries."
+                    technology "function"
+                    tags "Code"
+                }
                 chrislyons_dev_flarelette_hono__middleware__extractbearertoken = component "middleware.extractBearerToken" {
                     description "Extract Bearer token from Authorization header"
                     technology "function"
@@ -106,6 +115,7 @@ workspace "flarelette-hono" "Type-safe JWT authentication middleware for Hono on
                 # Component relationships
                 chrislyons_dev_flarelette_hono__main -> chrislyons_dev_flarelette_hono__middleware "authentication middleware"
                 chrislyons_dev_flarelette_hono__main -> chrislyons_dev_flarelette_hono__policy_builder "policy builder"
+                chrislyons_dev_flarelette_hono__main -> chrislyons_dev_flarelette_hono__logging "structured logging middleware"
                 chrislyons_dev_flarelette_hono__middleware -> chrislyons_dev_flarelette_hono__types "environment and policy types"
                 chrislyons_dev_flarelette_hono__policy_builder -> chrislyons_dev_flarelette_hono__types "policy types"
             }
@@ -331,10 +341,17 @@ branding {
 
         component chrislyons_dev_flarelette_hono "Components__chrislyons_dev_flarelette_hono" {
             include chrislyons_dev_flarelette_hono__main
+            include chrislyons_dev_flarelette_hono__logging
             include chrislyons_dev_flarelette_hono__middleware
             include chrislyons_dev_flarelette_hono__policy_builder
             include chrislyons_dev_flarelette_hono__types
             exclude "element.tag==Code"
+            autoLayout
+        }
+
+
+        component chrislyons_dev_flarelette_hono "Classes_chrislyons_dev_flarelette_hono__logging" {
+            include chrislyons_dev_flarelette_hono__logging__createlogger
             autoLayout
         }
 

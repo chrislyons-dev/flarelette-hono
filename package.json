@@ -52,13 +52,21 @@
   "peerDependencies": {
     "hono": "^4.0.0",
     "zod": "^3.22.0",
-    "@hono/zod-validator": "^0.2.0"
+    "@hono/zod-validator": "^0.2.0",
+    "hono-pino": "^0.4.0",
+    "pino": "^8.0.0"
   },
   "peerDependenciesMeta": {
     "zod": {
       "optional": true
     },
     "@hono/zod-validator": {
+      "optional": true
+    },
+    "hono-pino": {
+      "optional": true
+    },
+    "pino": {
       "optional": true
     }
   },

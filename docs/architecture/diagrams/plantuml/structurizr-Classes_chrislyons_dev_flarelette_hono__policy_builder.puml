@@ -121,6 +121,7 @@ skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono>> {
 }
 
 rectangle "@chrislyons-dev/flarelette-hono\n<size:10>[Container: Service]</size>" <<flarelettehono.chrislyonsdevflarelettehono>> {
+  rectangle "==policy-builder.policy\n<size:10>[Component: function]</size>\n\nCreate a new policy builder" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderpolicy>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderpolicy
   rectangle "==policy-builder.PolicyImpl\n<size:10>[Component: class]</size>\n\nConcrete policy implementation Evaluates rules against JWT payload to determine access." <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImpl>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImpl
   rectangle "==policy-builder.PolicyImpl.evaluate\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluate>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluate
   rectangle "==policy-builder.PolicyImpl.evaluateRule\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRule>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyImplevaluateRule
@@ -134,7 +135,6 @@ rectangle "@chrislyons-dev/flarelette-hono\n<size:10>[Container: Service]</size>
   rectangle "==policy-builder.PolicyBuilderImpl.needAny\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAny>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAny
   rectangle "==policy-builder.PolicyBuilderImpl.needAll\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAll>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplneedAll
   rectangle "==policy-builder.PolicyBuilderImpl.build\n<size:10>[Component: method]</size>" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplbuild>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderPolicyBuilderImplbuild
-  rectangle "==policy-builder.policy\n<size:10>[Component: function]</size>\n\nCreate a new policy builder" <<flarelettehono.chrislyonsdevflarelettehono.policybuilderpolicy>> as flarelettehono.chrislyonsdevflarelettehono.policybuilderpolicy
 }
 
 @enduml
