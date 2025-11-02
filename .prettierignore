@@ -1,0 +1,14 @@
+# Generated files
+CHANGELOG.md
+package-lock.json
+
+# Build outputs
+dist/
+site/
+coverage/
+
+# Dependencies
+node_modules/
+
+# Configuration
+.wrangler/

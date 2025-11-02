@@ -1,0 +1,62 @@
+system:
+  name: flarelette-hono
+  description: Type-safe JWT authentication middleware for Hono on Cloudflare Workers
+  repository: https://github.com/chrislyons-dev/flarelette-hono.git
+
+project:
+  name: flarelette-hono
+  description: Type-safe JWT authentication middleware for Hono on Cloudflare Workers
+
+paths:
+  output: ./architecture
+  logs: ./architecture/logs
+  ir_out: ./architecture/flarelette-hono-ir.json
+  dsl_out: ./architecture/flarelette-hono.dsl
+  render_out: ./architecture/diagrams
+  docs_out: ./architecture
+allowedPluginPaths:
+  - ./plugins
+  - ./custom-plugins
+allowedAbsolutePaths:
+  - /users/chris/git/flarelette-hono
+  - C:\users\chris\git\flarelette-hono
+
+extractors:
+  - use: extractors/builtin/basic-node
+    inputs:
+      include:
+        - './src/**/*.js'
+        - './src/**/*.cjs'
+        - './src/**/*.mjs'
+        - './src/**/*.jsx'
+        - './src/**/*.ts'
+        - './src/**/*.tsx'
+      exclude:
+        - '**/node_modules/**'
+        - '**/dist/**'
+        - '**/build/**'
+        - '**/*.test.*'
+        - '**/*.spec.*'
+        - '**/test/**'
+        - '**/tests/**'
+        - '**/vitest.config.ts'
+
+# ir json in, ir json out (or errors)
+validators:
+  - use: validators/builtin/base-validator
+
+# ir json in, dsl out
+generators:
+  - use: generators/builtin/structurizr
+
+# dsl in, images out
+# Renderers run sequentially - order matters!
+# 1. Export DSL to PlantUML/Mermaid
+# 2. Render PlantUML to PNG images
+renderers:
+  - use: renderers/builtin/structurizr-export
+  - use: renderers/builtin/plantuml-render
+
+# dsl & images in, (likely markdown) docs out
+docs:
+  - use: docs/builtin/markdown-docs

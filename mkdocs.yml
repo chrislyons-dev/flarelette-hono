@@ -1,0 +1,131 @@
+site_name: Flarelette-Hono
+site_description: Type-safe JWT authentication middleware for Hono on Cloudflare Workers
+site_author: Chris Lyons
+site_url: https://chrislyons-dev.github.io/flarelette-hono/
+
+repo_name: chrislyons-dev/flarelette-hono
+repo_url: https://github.com/chrislyons-dev/flarelette-hono
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2025 Chris Lyons
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.copy
+    - content.code.annotate
+
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+plugins:
+  - search:
+      lang: en
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - meta
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Quick Start: getting-started/quick-start.md
+      - Installation: getting-started/installation.md
+      - Configuration: getting-started/configuration.md
+  - Guides:
+      - Authentication: guides/authentication.md
+      - Authorization: guides/authorization.md
+      - Input Validation: guides/validation.md
+      - Structured Logging: guides/logging.md
+  - Design:
+      - Architecture: design/architecture.md
+      - JWT Integration: design/jwt-integration.md
+      - Type System: design/type-system.md
+  - API Reference:
+      - Overview: api/middleware.md
+      - Generated Docs: architecture/README.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/chrislyons-dev
+    - icon: fontawesome/brands/npm
+      link: https://www.npmjs.com/package/@chrislyons-dev/flarelette-hono
+
+  version:
+    provider: mike
+
+extra_css:
+  - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/extra.js

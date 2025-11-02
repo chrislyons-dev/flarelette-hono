@@ -1,0 +1,20 @@
+graph TB
+  linkStyle default fill:#ffffff
+
+  subgraph diagram ["flarelette-hono - @chrislyons-dev/flarelette-hono - Components"]
+    style diagram fill:#ffffff,stroke:#ffffff
+
+    subgraph 2 ["@chrislyons-dev/flarelette-hono"]
+      style 2 fill:#ffffff,stroke:#2e6295,color:#2e6295
+
+      10("<div style='font-weight: bold'>logging.extractRequestId</div><div style='font-size: 70%; margin-top: 0px'>[Component: function]</div><div style='font-size: 80%; margin-top:10px'>Request ID extractor for<br />correlation (ADR-0013<br />requirement) Returns<br />undefined to let hono-pino<br />automatically extract<br />X-Request-ID header. This<br />enables distributed tracing<br />across service boundaries.</div>")
+      style 10 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      11("<div style='font-weight: bold'>logging.createLogger</div><div style='font-size: 70%; margin-top: 0px'>[Component: function]</div><div style='font-size: 80%; margin-top:10px'>Create ADR-0013 compliant<br />structured logger Returns a<br />Hono middleware that<br />automatically logs request<br />start/completion and provides<br />a structured logger instance<br />in the context. **ADR-0013<br />Schema:** ```json {<br />"timestamp":<br />"2025-11-02T12:34:56.789Z",<br />"level": "info", "service":<br />"bond-valuation",<br />"requestId": "uuid-v4",<br />"message": "Request<br />completed", "duration": 125,<br />"method": "POST", "path":<br />"/api/price", "status": 200 }<br />``` **Request Correlation:**<br />The logger automatically<br />extracts and propagates<br />`X-Request-ID` header for<br />distributed tracing across<br />service boundaries.</div>")
+      style 11 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      8("<div style='font-weight: bold'>logging.formatLevel</div><div style='font-size: 70%; margin-top: 0px'>[Component: function]</div><div style='font-size: 80%; margin-top:10px'>Format log level as string<br />(ADR-0013 requirement) Pino<br />formats levels as numbers by<br />default, but ADR-0013<br />requires string levels.</div>")
+      style 8 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      9("<div style='font-weight: bold'>logging.generateTimestamp</div><div style='font-size: 70%; margin-top: 0px'>[Component: function]</div><div style='font-size: 80%; margin-top:10px'>Generate ISO 8601 timestamp<br />for logs (ADR-0013<br />requirement) Returns current<br />timestamp in ISO 8601 format<br />with milliseconds, formatted<br />as a JSON fragment for Pino.</div>")
+      style 9 fill:#85bbf0,stroke:#5d82a8,color:#000000
+    end
+
+  end

@@ -1,0 +1,60 @@
+@startuml
+set separator none
+title flarelette-hono - @chrislyons-dev/flarelette-hono - Components
+
+top to bottom direction
+skinparam ranksep 60
+skinparam nodesep 30
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  defaultFontName "Arial"
+}
+
+hide stereotype
+
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.loggingcreateLogger>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.loggingextractRequestId>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.loggingformatLevel>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.logginggenerateTimestamp>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono>> {
+  BorderColor #2e6295
+  FontColor #2e6295
+  shadowing false
+}
+
+rectangle "@chrislyons-dev/flarelette-hono\n<size:10>[Container: Service]</size>" <<flarelettehono.chrislyonsdevflarelettehono>> {
+  rectangle "==logging.extractRequestId\n<size:10>[Component: function]</size>\n\nRequest ID extractor for correlation (ADR-0013 requirement) Returns undefined to let hono-pino automatically extract X-Request-ID header. This enables distributed tracing across service boundaries." <<flarelettehono.chrislyonsdevflarelettehono.loggingextractRequestId>> as flarelettehono.chrislyonsdevflarelettehono.loggingextractRequestId
+  rectangle "==logging.createLogger\n<size:10>[Component: function]</size>\n\nCreate ADR-0013 compliant structured logger Returns a Hono middleware that automatically logs request start/completion and provides a structured logger instance in the context. **ADR-0013 Schema:** ```json { "timestamp": "2025-11-02T12:34:56.789Z", "level": "info", "service": "bond-valuation", "requestId": "uuid-v4", "message": "Request completed", "duration": 125, "method": "POST", "path": "/api/price", "status": 200 } ``` **Request Correlation:** The logger automatically extracts and propagates `X-Request-ID` header for distributed tracing across service boundaries." <<flarelettehono.chrislyonsdevflarelettehono.loggingcreateLogger>> as flarelettehono.chrislyonsdevflarelettehono.loggingcreateLogger
+  rectangle "==logging.formatLevel\n<size:10>[Component: function]</size>\n\nFormat log level as string (ADR-0013 requirement) Pino formats levels as numbers by default, but ADR-0013 requires string levels." <<flarelettehono.chrislyonsdevflarelettehono.loggingformatLevel>> as flarelettehono.chrislyonsdevflarelettehono.loggingformatLevel
+  rectangle "==logging.generateTimestamp\n<size:10>[Component: function]</size>\n\nGenerate ISO 8601 timestamp for logs (ADR-0013 requirement) Returns current timestamp in ISO 8601 format with milliseconds, formatted as a JSON fragment for Pino." <<flarelettehono.chrislyonsdevflarelettehono.logginggenerateTimestamp>> as flarelettehono.chrislyonsdevflarelettehono.logginggenerateTimestamp
+}
+
+@enduml

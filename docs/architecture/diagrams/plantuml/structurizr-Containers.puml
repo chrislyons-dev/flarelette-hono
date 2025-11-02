@@ -1,0 +1,52 @@
+@startuml
+set separator none
+title flarelette-hono - Containers
+
+top to bottom direction
+skinparam ranksep 60
+skinparam nodesep 30
+
+skinparam {
+  arrowFontSize 10
+  defaultTextAlignment center
+  wrapWidth 200
+  maxMessageSize 100
+  defaultFontName "Arial"
+}
+
+hide stereotype
+
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono>> {
+  BackgroundColor #438dd5
+  FontColor #ffffff
+  BorderColor #2e6295
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.flarelettehonoauthenticatedexample>> {
+  BackgroundColor #438dd5
+  FontColor #ffffff
+  BorderColor #2e6295
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono.flarelettehonominimalexample>> {
+  BackgroundColor #438dd5
+  FontColor #ffffff
+  BorderColor #2e6295
+  roundCorner 20
+  shadowing false
+}
+skinparam rectangle<<flarelettehono>> {
+  BorderColor #0b4884
+  FontColor #0b4884
+  shadowing false
+}
+
+rectangle "flarelette-hono\n<size:10>[Software System]</size>" <<flarelettehono>> {
+  rectangle "==@chrislyons-dev/flarelette-hono\n<size:10>[Container: Service]</size>\n\nType-safe JWT authentication middleware for Hono on Cloudflare Workers" <<flarelettehono.chrislyonsdevflarelettehono>> as flarelettehono.chrislyonsdevflarelettehono
+  rectangle "==flarelette-hono-authenticated-example\n<size:10>[Container: Service]</size>\n\nService: flarelette-hono-authenticated-example" <<flarelettehono.flarelettehonoauthenticatedexample>> as flarelettehono.flarelettehonoauthenticatedexample
+  rectangle "==flarelette-hono-minimal-example\n<size:10>[Container: Service]</size>\n\nService: flarelette-hono-minimal-example" <<flarelettehono.flarelettehonominimalexample>> as flarelettehono.flarelettehonominimalexample
+}
+
+@enduml

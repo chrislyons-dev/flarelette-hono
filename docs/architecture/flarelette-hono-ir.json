@@ -1,0 +1,680 @@
+{
+  "version": "1.0",
+  "system": {
+    "description": "Type-safe JWT authentication middleware for Hono on Cloudflare Workers",
+    "name": "flarelette-hono",
+    "repository": "https://github.com/chrislyons-dev/flarelette-hono.git"
+  },
+  "actors": [],
+  "containers": [
+    {
+      "description": "Type-safe JWT authentication middleware for Hono on Cloudflare Workers",
+      "tags": [
+        "Auto-generated"
+      ],
+      "id": "chrislyons_dev_flarelette_hono",
+      "name": "@chrislyons-dev/flarelette-hono",
+      "type": "Service",
+      "layer": "Application"
+    },
+    {
+      "description": "Service: flarelette-hono-authenticated-example",
+      "tags": [
+        "Auto-generated"
+      ],
+      "id": "flarelette_hono_authenticated_example",
+      "name": "flarelette-hono-authenticated-example",
+      "type": "Service",
+      "layer": "Application"
+    },
+    {
+      "description": "Service: flarelette-hono-minimal-example",
+      "tags": [
+        "Auto-generated"
+      ],
+      "id": "flarelette_hono_minimal_example",
+      "name": "flarelette-hono-minimal-example",
+      "type": "Service",
+      "layer": "Application"
+    }
+  ],
+  "components": [
+    {
+      "description": "flarelette-hono - Type-safe JWT authentication middleware for Hono\n\nFramework adapter for Cloudflare Workers built on Hono + Flarelette JWT.\nProvides declarative JWT authentication and policy enforcement.",
+      "id": "chrislyons_dev_flarelette_hono__main",
+      "containerId": "chrislyons_dev_flarelette_hono",
+      "name": "main",
+      "type": "module"
+    },
+    {
+      "description": "Structured logging for Hono applications\n\nProvides ADR-0013 compliant structured logging using hono-pino.\nThis is a thin wrapper that configures pino with the correct schema\nfor polyglot microservice consistency.",
+      "id": "chrislyons_dev_flarelette_hono__logging",
+      "containerId": "chrislyons_dev_flarelette_hono",
+      "name": "logging",
+      "type": "module"
+    },
+    {
+      "description": "Authentication middleware for Hono\n\nProvides JWT authentication and authorization for Hono applications on Cloudflare Workers.",
+      "id": "chrislyons_dev_flarelette_hono__middleware",
+      "containerId": "chrislyons_dev_flarelette_hono",
+      "name": "middleware",
+      "type": "module"
+    },
+    {
+      "description": "Policy builder for declarative JWT authorization\n\nProvides fluent API for constructing authorization policies based on JWT claims.",
+      "id": "chrislyons_dev_flarelette_hono__policy_builder",
+      "containerId": "chrislyons_dev_flarelette_hono",
+      "name": "policy-builder",
+      "type": "module"
+    },
+    {
+      "description": "Type definitions for flarelette-hono\n\nRe-exports types from",
+      "id": "chrislyons_dev_flarelette_hono__types",
+      "containerId": "chrislyons_dev_flarelette_hono",
+      "name": "types",
+      "type": "module"
+    }
+  ],
+  "code": [
+    {
+      "description": "Format log level as string (ADR-0013 requirement)\n\nPino formats levels as numbers by default, but ADR-0013 requires string levels.",
+      "id": "chrislyons_dev_flarelette_hono__logging__formatlevel",
+      "componentId": "chrislyons_dev_flarelette_hono__logging",
+      "name": "formatLevel",
+      "type": "function",
+      "documentation": {
+        "summary": "Format log level as string (ADR-0013 requirement)\n\nPino formats levels as numbers by default, but ADR-0013 requires string levels."
+      },
+      "returnType": "{ level: string; }",
+      "returnDescription": "Formatted level object",
+      "parameters": [
+        {
+          "name": "label",
+          "type": "string",
+          "description": "- Log level label (e.g., 'info', 'error')",
+          "optional": false
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "lineNumber": 53
+    },
+    {
+      "description": "Generate ISO 8601 timestamp for logs (ADR-0013 requirement)\n\nReturns current timestamp in ISO 8601 format with milliseconds,\nformatted as a JSON fragment for Pino.",
+      "id": "chrislyons_dev_flarelette_hono__logging__generatetimestamp",
+      "componentId": "chrislyons_dev_flarelette_hono__logging",
+      "name": "generateTimestamp",
+      "type": "function",
+      "documentation": {
+        "summary": "Generate ISO 8601 timestamp for logs (ADR-0013 requirement)\n\nReturns current timestamp in ISO 8601 format with milliseconds,\nformatted as a JSON fragment for Pino."
+      },
+      "returnType": "string",
+      "returnDescription": "Formatted timestamp string",
+      "parameters": [],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "lineNumber": 66
+    },
+    {
+      "description": "Request ID extractor for correlation (ADR-0013 requirement)\n\nReturns undefined to let hono-pino automatically extract X-Request-ID header.\nThis enables distributed tracing across service boundaries.",
+      "id": "chrislyons_dev_flarelette_hono__logging__extractrequestid",
+      "componentId": "chrislyons_dev_flarelette_hono__logging",
+      "name": "extractRequestId",
+      "type": "function",
+      "documentation": {
+        "summary": "Request ID extractor for correlation (ADR-0013 requirement)\n\nReturns undefined to let hono-pino automatically extract X-Request-ID header.\nThis enables distributed tracing across service boundaries."
+      },
+      "returnType": "undefined",
+      "returnDescription": "Always undefined (handled by hono-pino)",
+      "parameters": [],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "lineNumber": 79
+    },
+    {
+      "description": "Create ADR-0013 compliant structured logger\n\nReturns a Hono middleware that automatically logs request start/completion\nand provides a structured logger instance in the context.\n\n**ADR-0013 Schema:**\n```json\n{\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\n  \"level\": \"info\",\n  \"service\": \"bond-valuation\",\n  \"requestId\": \"uuid-v4\",\n  \"message\": \"Request completed\",\n  \"duration\": 125,\n  \"method\": \"POST\",\n  \"path\": \"/api/price\",\n  \"status\": 200\n}\n```\n\n**Request Correlation:**\nThe logger automatically extracts and propagates `X-Request-ID` header\nfor distributed tracing across service boundaries.",
+      "id": "chrislyons_dev_flarelette_hono__logging__createlogger",
+      "componentId": "chrislyons_dev_flarelette_hono__logging",
+      "name": "createLogger",
+      "type": "function",
+      "documentation": {
+        "summary": "Create ADR-0013 compliant structured logger\n\nReturns a Hono middleware that automatically logs request start/completion\nand provides a structured logger instance in the context.\n\n**ADR-0013 Schema:**\n```json\n{\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\n  \"level\": \"info\",\n  \"service\": \"bond-valuation\",\n  \"requestId\": \"uuid-v4\",\n  \"message\": \"Request completed\",\n  \"duration\": 125,\n  \"method\": \"POST\",\n  \"path\": \"/api/price\",\n  \"status\": 200\n}\n```\n\n**Request Correlation:**\nThe logger automatically extracts and propagates `X-Request-ID` header\nfor distributed tracing across service boundaries.",
+        "examples": [
+          "```typescript\nimport { Hono } from 'hono'\nimport { createLogger } from '@chrislyons-dev/flarelette-hono'\n\nconst app = new Hono()\n\n// Add structured logging middleware\napp.use('*', createLogger({ service: 'bond-valuation' }))\n\napp.get('/price', async (c) => {\n  // Access logger from context\n  c.get('logger').info({ calculation: 'started' }, 'Calculating bond price')\n  return c.json({ price: 99.948 })\n})\n```",
+          "```typescript\n// Combine with auth middleware\napp.use('*', createLogger({ service: 'my-service' }))\napp.use('*', authGuard())\n\napp.post('/data', async (c) => {\n  const logger = c.get('logger')\n  const auth = c.get('auth')\n\n  logger.info({ userId: auth.sub }, 'Processing request')\n  return c.json({ ok: true })\n})\n```"
+        ]
+      },
+      "returnType": "MiddlewareHandler",
+      "returnDescription": "Hono middleware for structured logging",
+      "parameters": [
+        {
+          "name": "options",
+          "type": "import(\"C:/Users/chris/git/flarelette-hono/src/logging\").LoggerOptions",
+          "description": "- Logger configuration",
+          "optional": false
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "lineNumber": 145
+    },
+    {
+      "description": "Extract Bearer token from Authorization header",
+      "id": "chrislyons_dev_flarelette_hono__middleware__extractbearertoken",
+      "componentId": "chrislyons_dev_flarelette_hono__middleware",
+      "name": "extractBearerToken",
+      "type": "function",
+      "documentation": {
+        "summary": "Extract Bearer token from Authorization header"
+      },
+      "returnType": "string",
+      "returnDescription": "Token string if valid Bearer token, null otherwise",
+      "parameters": [
+        {
+          "name": "authHeader",
+          "type": "string",
+          "description": "- Authorization header value",
+          "optional": false
+        }
+      ],
+      "visibility": "private",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "lineNumber": 21
+    },
+    {
+      "description": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
+      "id": "chrislyons_dev_flarelette_hono__middleware__authguard",
+      "componentId": "chrislyons_dev_flarelette_hono__middleware",
+      "name": "authGuard",
+      "type": "function",
+      "documentation": {
+        "summary": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
+        "examples": [
+          "```typescript\n// Authentication only\napp.get('/protected', authGuard(), async (c) => {\n  const auth = c.get('auth')\n  return c.json({ user: auth.sub })\n})\n\n// With authorization policy\nconst adminPolicy = policy().rolesAny('admin').build()\napp.get('/admin', authGuard(adminPolicy), async (c) => {\n  return c.json({ admin: true })\n})\n```"
+        ]
+      },
+      "returnType": "MiddlewareHandler<import(\"C:/Users/chris/git/flarelette-hono/src/types\").HonoEnv>",
+      "returnDescription": "Hono middleware handler",
+      "parameters": [
+        {
+          "name": "policy",
+          "type": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").Policy",
+          "description": "- Optional policy to enforce after authentication",
+          "optional": true
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "lineNumber": 64
+    },
+    {
+      "description": "Create a new policy builder",
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policy",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "policy",
+      "type": "function",
+      "documentation": {
+        "summary": "Create a new policy builder",
+        "examples": [
+          "```typescript\nconst adminPolicy = policy()\n  .rolesAny('admin', 'superuser')\n  .needAll('write:users', 'delete:users')\n  .build()\n```"
+        ]
+      },
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyBuilder",
+      "returnDescription": "PolicyBuilder instance for fluent API construction",
+      "parameters": [],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 199
+    },
+    {
+      "description": "Concrete policy implementation\n\nEvaluates rules against JWT payload to determine access.",
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policyimpl",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyImpl",
+      "type": "class",
+      "documentation": {
+        "summary": "Concrete policy implementation\n\nEvaluates rules against JWT payload to determine access."
+      },
+      "visibility": "private",
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 26,
+      "metadata": {
+        "implements": [
+          "Policy"
+        ]
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policyimpl_evaluate",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyImpl.evaluate",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyResult",
+      "parameters": [
+        {
+          "name": "payload",
+          "type": "JwtPayload",
+          "optional": false
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 29,
+      "metadata": {
+        "className": "PolicyImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policyimpl_evaluaterule",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyImpl.evaluateRule",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyResult",
+      "parameters": [
+        {
+          "name": "rule",
+          "type": "PolicyRule",
+          "optional": false
+        },
+        {
+          "name": "payload",
+          "type": "JwtPayload",
+          "optional": false
+        }
+      ],
+      "visibility": "private",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 46,
+      "metadata": {
+        "className": "PolicyImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policyimpl_evaluaterolesany",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyImpl.evaluateRolesAny",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyResult",
+      "parameters": [
+        {
+          "name": "required",
+          "type": "string[]",
+          "optional": false
+        },
+        {
+          "name": "payload",
+          "type": "JwtPayload",
+          "optional": false
+        }
+      ],
+      "visibility": "private",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 59,
+      "metadata": {
+        "className": "PolicyImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policyimpl_evaluaterolesall",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyImpl.evaluateRolesAll",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyResult",
+      "parameters": [
+        {
+          "name": "required",
+          "type": "string[]",
+          "optional": false
+        },
+        {
+          "name": "payload",
+          "type": "JwtPayload",
+          "optional": false
+        }
+      ],
+      "visibility": "private",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 79,
+      "metadata": {
+        "className": "PolicyImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policyimpl_evaluateneedany",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyImpl.evaluateNeedAny",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyResult",
+      "parameters": [
+        {
+          "name": "required",
+          "type": "string[]",
+          "optional": false
+        },
+        {
+          "name": "payload",
+          "type": "JwtPayload",
+          "optional": false
+        }
+      ],
+      "visibility": "private",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 99,
+      "metadata": {
+        "className": "PolicyImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policyimpl_evaluateneedall",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyImpl.evaluateNeedAll",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyResult",
+      "parameters": [
+        {
+          "name": "required",
+          "type": "string[]",
+          "optional": false
+        },
+        {
+          "name": "payload",
+          "type": "JwtPayload",
+          "optional": false
+        }
+      ],
+      "visibility": "private",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 119,
+      "metadata": {
+        "className": "PolicyImpl"
+      }
+    },
+    {
+      "description": "Policy builder implementation\n\nFluent API for constructing authorization policies.",
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policybuilderimpl",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyBuilderImpl",
+      "type": "class",
+      "documentation": {
+        "summary": "Policy builder implementation\n\nFluent API for constructing authorization policies."
+      },
+      "visibility": "private",
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 145,
+      "metadata": {
+        "implements": [
+          "PolicyBuilder"
+        ]
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policybuilderimpl_rolesany",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyBuilderImpl.rolesAny",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyBuilder",
+      "parameters": [
+        {
+          "name": "roles",
+          "type": "string[]",
+          "optional": true
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 148,
+      "metadata": {
+        "className": "PolicyBuilderImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policybuilderimpl_rolesall",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyBuilderImpl.rolesAll",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyBuilder",
+      "parameters": [
+        {
+          "name": "roles",
+          "type": "string[]",
+          "optional": true
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 156,
+      "metadata": {
+        "className": "PolicyBuilderImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policybuilderimpl_needany",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyBuilderImpl.needAny",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyBuilder",
+      "parameters": [
+        {
+          "name": "permissions",
+          "type": "string[]",
+          "optional": true
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 164,
+      "metadata": {
+        "className": "PolicyBuilderImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policybuilderimpl_needall",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyBuilderImpl.needAll",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyBuilder",
+      "parameters": [
+        {
+          "name": "permissions",
+          "type": "string[]",
+          "optional": true
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 172,
+      "metadata": {
+        "className": "PolicyBuilderImpl"
+      }
+    },
+    {
+      "id": "chrislyons_dev_flarelette_hono__policy_builder__policybuilderimpl_build",
+      "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
+      "name": "PolicyBuilderImpl.build",
+      "type": "method",
+      "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").Policy",
+      "parameters": [],
+      "visibility": "public",
+      "isAsync": false,
+      "isStatic": false,
+      "isAbstract": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "lineNumber": 180,
+      "metadata": {
+        "className": "PolicyBuilderImpl"
+      }
+    }
+  ],
+  "deployments": [],
+  "containerRelationships": [],
+  "componentRelationships": [
+    {
+      "description": "authentication middleware",
+      "tags": [],
+      "source": "chrislyons_dev_flarelette_hono__main",
+      "destination": "chrislyons_dev_flarelette_hono__middleware"
+    },
+    {
+      "description": "policy builder",
+      "tags": [],
+      "source": "chrislyons_dev_flarelette_hono__main",
+      "destination": "chrislyons_dev_flarelette_hono__policy_builder"
+    },
+    {
+      "description": "structured logging middleware",
+      "tags": [],
+      "source": "chrislyons_dev_flarelette_hono__main",
+      "destination": "chrislyons_dev_flarelette_hono__logging"
+    },
+    {
+      "description": "imports MiddlewareHandler",
+      "source": "chrislyons_dev_flarelette_hono__logging",
+      "destination": "hono",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "environment and policy types",
+      "tags": [],
+      "source": "chrislyons_dev_flarelette_hono__middleware",
+      "destination": "chrislyons_dev_flarelette_hono__types"
+    },
+    {
+      "description": "Context | MiddlewareHandler",
+      "source": "chrislyons_dev_flarelette_hono__middleware",
+      "destination": "hono",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports adapters",
+      "source": "chrislyons_dev_flarelette_hono__middleware",
+      "destination": "@chrislyons-dev/flarelette-jwt",
+      "stereotype": "import"
+    },
+    {
+      "description": "HonoEnv | Policy",
+      "source": "chrislyons_dev_flarelette_hono__middleware",
+      "destination": "./types.js",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "policy types",
+      "tags": [],
+      "source": "chrislyons_dev_flarelette_hono__policy_builder",
+      "destination": "chrislyons_dev_flarelette_hono__types"
+    },
+    {
+      "description": "imports JwtPayload",
+      "source": "chrislyons_dev_flarelette_hono__policy_builder",
+      "destination": "@chrislyons-dev/flarelette-jwt",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "Policy | PolicyBuilder | PolicyResult",
+      "source": "chrislyons_dev_flarelette_hono__policy_builder",
+      "destination": "./types.js",
+      "stereotype": "type-import"
+    }
+  ],
+  "codeRelationships": [
+    {
+      "description": "imports MiddlewareHandler",
+      "source": "C:/Users/chris/git/flarelette-hono/src/logging.ts",
+      "destination": "hono:MiddlewareHandler",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports Context",
+      "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "destination": "hono:Context",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports MiddlewareHandler",
+      "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "destination": "hono:MiddlewareHandler",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports adapters",
+      "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "destination": "@chrislyons-dev/flarelette-jwt:adapters",
+      "stereotype": "import"
+    },
+    {
+      "description": "imports HonoEnv",
+      "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "destination": "./types.js:HonoEnv",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports Policy",
+      "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "destination": "./types.js:Policy",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports JwtPayload",
+      "source": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "destination": "@chrislyons-dev/flarelette-jwt:JwtPayload",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports Policy",
+      "source": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "destination": "./types.js:Policy",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports PolicyBuilder",
+      "source": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "destination": "./types.js:PolicyBuilder",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports PolicyResult",
+      "source": "C:/Users/chris/git/flarelette-hono/src/policy.ts",
+      "destination": "./types.js:PolicyResult",
+      "stereotype": "type-import"
+    }
+  ],
+  "deploymentRelationships": []
+}
