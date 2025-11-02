@@ -28,7 +28,9 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "check": "npm run lint && npm run licenses:generate && npm run archlette && npm run format && npm run type-check && npm run test",
     "licenses:generate": "npx license-checker-rseidelsohn --out THIRD-PARTY-LICENSES.md",
-    "prepublishOnly": "npm build && npm test"
+    "docs:build": "mkdocs build",
+    "docs:serve": "mkdocs serve",
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "jwt",

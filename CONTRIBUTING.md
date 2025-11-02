@@ -483,33 +483,56 @@ Brief description of changes.
 
 ## Release Process
 
+**Releases are fully automated using [release-please](https://github.com/googleapis/release-please).**
+
 ### Version Numbering
 
 Follow [Semantic Versioning](https://semver.org/):
 
-- **MAJOR**: Breaking changes (e.g., 1.0.0 → 2.0.0)
-- **MINOR**: New features (e.g., 1.0.0 → 1.1.0)
-- **PATCH**: Bug fixes (e.g., 1.0.0 → 1.0.1)
+- **MAJOR**: Breaking changes (`feat!:` or `fix!:` commits)
+- **MINOR**: New features (`feat:` commits)
+- **PATCH**: Bug fixes (`fix:` or `perf:` commits)
 
-### Release Checklist
+### How Releases Work
 
-1. **Update version** in `package.json`
-2. **Update CHANGELOG.md**
-3. **Run full test suite**
-4. **Build package**
-   ```bash
-   pnpm build
-   ```
-5. **Create git tag**
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
-6. **Publish to npm**
-   ```bash
-   npm publish --access public
-   ```
-7. **Create GitHub release**
+1. **Merge PRs to main** with conventional commit messages
+2. **Release-please creates a release PR** automatically
+   - Updates version in `package.json`
+   - Updates `CHANGELOG.md` with all changes since last release
+   - Groups changes by type (Features, Bug Fixes, etc.)
+3. **Review and merge the release PR**
+4. **Release-please automatically:**
+   - Creates a GitHub release with release notes
+   - Publishes to NPM
+   - Publishes to GitHub Packages
+   - Tags the release
+
+### Manual Release (Maintainers Only)
+
+If you need to trigger a release manually:
+
+1. Ensure all commits follow conventional commit format
+2. Merge all ready PRs to `main`
+3. Wait for release-please to create a release PR
+4. Review the generated CHANGELOG and version bump
+5. Merge the release PR
+6. CI automatically publishes to NPM
+
+### What Gets Included in Releases
+
+Release-please determines version bumps based on commit types:
+
+| Commit Type | Version Bump | Example |
+|-------------|--------------|---------|
+| `feat!:` | Major | `feat!: remove deprecated API` |
+| `fix!:` | Major | `fix!: change response format` |
+| `feat:` | Minor | `feat: add logging helper` |
+| `fix:` | Patch | `fix: handle null tokens` |
+| `perf:` | Patch | `perf: optimize verification` |
+| `docs:` | None | `docs: update README` |
+| `chore:` | None | `chore: update dependencies` |
+| `refactor:` | None | `refactor: simplify middleware` |
+| `test:` | None | `test: add edge cases` |
 
 ---
 

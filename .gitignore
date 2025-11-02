@@ -141,3 +141,6 @@ vite.config.ts.timestamp-*
 notes/
 CLAUDE.md
 .claude/
+
+# MkDocs build output
+site/
