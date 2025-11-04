@@ -14,6 +14,12 @@ export type {
   WorkerEnv,
   AlgType,
   JwtValue,
+  JwtHeader,
+  JwtProfile,
+  ParsedJwt,
+  Fetcher,
+  JWKSResponse,
+  EnvBag,
 } from '@chrislyons-dev/flarelette-jwt'
 
 /**
