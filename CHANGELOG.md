@@ -9,6 +9,12 @@
 
 ## 1.0.0 (2025-11-02)
 
+* **deps:** Updated `@chrislyons-dev/flarelette-jwt` to v1.10.0
+  - Adds support for new JWT types and utilities
+  - Improved JWKS fetching with Service Binding support
+  - Re-exported additional types: `JwtHeader`, `JwtProfile`, `ParsedJwt`, `Fetcher`, `JWKSResponse`, `EnvBag`
+
+## 1.0.0 (2025-11-02)
 
 ### Features
 

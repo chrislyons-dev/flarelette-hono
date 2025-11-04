@@ -58,4 +58,10 @@ export type {
   WorkerEnv,
   AlgType,
   JwtValue,
+  JwtHeader,
+  JwtProfile,
+  ParsedJwt,
+  Fetcher,
+  JWKSResponse,
+  EnvBag,
 } from './types.js'
