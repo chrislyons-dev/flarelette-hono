@@ -67,6 +67,11 @@ workspace "flarelette-hono" "Type-safe JWT authentication middleware for Hono on
                     technology "function"
                     tags "Code"
                 }
+                chrislyons_dev_flarelette_hono__middleware__authguardwithconfig = component "middleware.authGuardWithConfig" {
+                    description "Authentication guard middleware with explicit configuration Verifies JWT tokens using explicit configuration objects instead of environment variables. This approach is ideal for testing, multi-tenant scenarios, or when you want to avoid environment variable dependencies."
+                    technology "function"
+                    tags "Code"
+                }
                 chrislyons_dev_flarelette_hono__policy_builder__policy = component "policy-builder.policy" {
                     description "Create a new policy builder"
                     technology "function"
@@ -377,6 +382,7 @@ branding {
         component chrislyons_dev_flarelette_hono "Classes_chrislyons_dev_flarelette_hono__middleware" {
             include chrislyons_dev_flarelette_hono__middleware__extractbearertoken
             include chrislyons_dev_flarelette_hono__middleware__authguard
+            include chrislyons_dev_flarelette_hono__middleware__authguardwithconfig
             autoLayout
         }
 

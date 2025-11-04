@@ -37,7 +37,10 @@
  */
 
 // Core middleware
-export { authGuard } from './middleware.js'
+export { authGuard, authGuardWithConfig } from './middleware.js'
+
+// Configuration helpers (re-export from flarelette-jwt)
+export { createHS512Config, createEdDSAVerifyConfig } from '@chrislyons-dev/flarelette-jwt'
 
 // Policy builder
 export { policy } from './policy.js'
@@ -64,4 +67,9 @@ export type {
   Fetcher,
   JWKSResponse,
   EnvBag,
+  // Explicit configuration types
+  BaseJwtConfig,
+  HS512Config,
+  EdDSAVerifyConfig,
+  VerifyConfig,
 } from './types.js'

@@ -20,6 +20,13 @@ export type {
   Fetcher,
   JWKSResponse,
   EnvBag,
+  // Explicit configuration types
+  BaseJwtConfig,
+  HS512Config,
+  EdDSASignConfig,
+  EdDSAVerifyConfig,
+  SignConfig,
+  VerifyConfig,
 } from '@chrislyons-dev/flarelette-jwt'
 
 /**

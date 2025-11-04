@@ -11,6 +11,8 @@ graph TB
       style 12 fill:#85bbf0,stroke:#5d82a8,color:#000000
       13("<div style='font-weight: bold'>middleware.authGuard</div><div style='font-size: 70%; margin-top: 0px'>[Component: function]</div><div style='font-size: 80%; margin-top:10px'>Authentication guard<br />middleware Verifies JWT<br />tokens and optionally<br />enforces authorization<br />policies. Injects verified<br />payload into context as<br />`auth` variable.</div>")
       style 13 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      14("<div style='font-weight: bold'>middleware.authGuardWithConfig</div><div style='font-size: 70%; margin-top: 0px'>[Component: function]</div><div style='font-size: 80%; margin-top:10px'>Authentication guard<br />middleware with explicit<br />configuration Verifies JWT<br />tokens using explicit<br />configuration objects instead<br />of environment variables.<br />This approach is ideal for<br />testing, multi-tenant<br />scenarios, or when you want<br />to avoid environment variable<br />dependencies.</div>")
+      style 14 fill:#85bbf0,stroke:#5d82a8,color:#000000
     end
 
   end

@@ -7,34 +7,34 @@ graph TB
     subgraph 2 ["@chrislyons-dev/flarelette-hono"]
       style 2 fill:#ffffff,stroke:#2e6295,color:#2e6295
 
-      14("<div style='font-weight: bold'>policy-builder.policy</div><div style='font-size: 70%; margin-top: 0px'>[Component: function]</div><div style='font-size: 80%; margin-top:10px'>Create a new policy builder</div>")
-      style 14 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      15("<div style='font-weight: bold'>policy-builder.PolicyImpl</div><div style='font-size: 70%; margin-top: 0px'>[Component: class]</div><div style='font-size: 80%; margin-top:10px'>Concrete policy<br />implementation Evaluates<br />rules against JWT payload to<br />determine access.</div>")
+      15("<div style='font-weight: bold'>policy-builder.policy</div><div style='font-size: 70%; margin-top: 0px'>[Component: function]</div><div style='font-size: 80%; margin-top:10px'>Create a new policy builder</div>")
       style 15 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      16("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluate</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      16("<div style='font-weight: bold'>policy-builder.PolicyImpl</div><div style='font-size: 70%; margin-top: 0px'>[Component: class]</div><div style='font-size: 80%; margin-top:10px'>Concrete policy<br />implementation Evaluates<br />rules against JWT payload to<br />determine access.</div>")
       style 16 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      17("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateRule</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      17("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluate</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 17 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      18("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateRolesAny</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      18("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateRule</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 18 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      19("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateRolesAll</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      19("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateRolesAny</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 19 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      20("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateNeedAny</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      20("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateRolesAll</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 20 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      21("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateNeedAll</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      21("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateNeedAny</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 21 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      22("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl</div><div style='font-size: 70%; margin-top: 0px'>[Component: class]</div><div style='font-size: 80%; margin-top:10px'>Policy builder implementation<br />Fluent API for constructing<br />authorization policies.</div>")
+      22("<div style='font-weight: bold'>policy-builder.PolicyImpl.evaluateNeedAll</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 22 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      23("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.rolesAny</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      23("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl</div><div style='font-size: 70%; margin-top: 0px'>[Component: class]</div><div style='font-size: 80%; margin-top:10px'>Policy builder implementation<br />Fluent API for constructing<br />authorization policies.</div>")
       style 23 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      24("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.rolesAll</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      24("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.rolesAny</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 24 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      25("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.needAny</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      25("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.rolesAll</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 25 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      26("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.needAll</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      26("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.needAny</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 26 fill:#85bbf0,stroke:#5d82a8,color:#000000
-      27("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.build</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      27("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.needAll</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
       style 27 fill:#85bbf0,stroke:#5d82a8,color:#000000
+      28("<div style='font-weight: bold'>policy-builder.PolicyBuilderImpl.build</div><div style='font-size: 70%; margin-top: 0px'>[Component: method]</div>")
+      style 28 fill:#85bbf0,stroke:#5d82a8,color:#000000
     end
 
   end
