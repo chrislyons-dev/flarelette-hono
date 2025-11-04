@@ -95,7 +95,7 @@ Injects verified payload into context as `auth` variable.
 </tr>
 <tr>
 <td><strong>Returns</strong></td>
-<td><code>MiddlewareHandler<import("C:/Users/chris/git/flarelette-hono/src/types").HonoEnv></code> — Hono middleware handler</td>
+<td><code>MiddlewareHandler<import("C:/Users/chris/git/flarelette-hono/src/types").HonoEnv<T>></code> — Hono middleware handler</td>
 </tr>
 <tr>
 <td><strong>Location</strong></td>

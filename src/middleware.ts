@@ -61,8 +61,10 @@ function extractBearerToken(authHeader: string | undefined): string | null {
  * })
  * ```
  */
-export function authGuard(policy?: Policy): MiddlewareHandler<HonoEnv> {
-  return async (c: Context<HonoEnv>, next) => {
+export function authGuard<T = Record<string, never>>(
+  policy?: Policy
+): MiddlewareHandler<HonoEnv<T>> {
+  return async (c: Context<HonoEnv<T>>, next) => {
     // Extract token from Authorization header
     const authHeader = c.req.header('Authorization')
     const token = extractBearerToken(authHeader)
@@ -78,8 +80,8 @@ export function authGuard(policy?: Policy): MiddlewareHandler<HonoEnv> {
     }
 
     // Verify token using flarelette-jwt
-    const env = c.env
-    const kit = adapters.makeKit(env)
+    // c.env is typed as T & WorkerEnv (intersection), which satisfies makeKit's requirements
+    const kit = adapters.makeKit(c.env)
     const payload = await kit.verify(token)
 
     // Fail-silent verification: null indicates any verification failure
