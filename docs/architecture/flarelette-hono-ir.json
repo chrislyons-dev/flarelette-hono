@@ -198,7 +198,7 @@
           "```typescript\n// Authentication only\napp.get('/protected', authGuard(), async (c) => {\n  const auth = c.get('auth')\n  return c.json({ user: auth.sub })\n})\n\n// With authorization policy\nconst adminPolicy = policy().rolesAny('admin').build()\napp.get('/admin', authGuard(adminPolicy), async (c) => {\n  return c.json({ admin: true })\n})\n```"
         ]
       },
-      "returnType": "MiddlewareHandler<import(\"C:/Users/chris/git/flarelette-hono/src/types\").HonoEnv>",
+      "returnType": "MiddlewareHandler<import(\"C:/Users/chris/git/flarelette-hono/src/types\").HonoEnv<T>>",
       "returnDescription": "Hono middleware handler",
       "parameters": [
         {

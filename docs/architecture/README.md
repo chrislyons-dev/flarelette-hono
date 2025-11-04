@@ -1,7 +1,7 @@
 # 🏗️ flarelette-hono
 
 **Architecture Documentation**
-Generated 2025-11-02 12:15:04
+Generated 2025-11-03 19:34:09
 
 ## Overview
 
