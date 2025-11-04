@@ -54,7 +54,7 @@
       "type": "module"
     },
     {
-      "description": "Authentication middleware for Hono\n\nProvides JWT authentication and authorization for Hono applications on Cloudflare Workers.",
+      "description": "Authentication middleware for Hono\r\n\r\nProvides JWT authentication and authorization for Hono applications on Cloudflare Workers.",
       "id": "chrislyons_dev_flarelette_hono__middleware",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "middleware",
@@ -68,7 +68,7 @@
       "type": "module"
     },
     {
-      "description": "Type definitions for flarelette-hono\n\nRe-exports types from",
+      "description": "Type definitions for flarelette-hono\r\n\r\nRe-exports types from",
       "id": "chrislyons_dev_flarelette_hono__types",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "types",
@@ -187,15 +187,15 @@
       "lineNumber": 21
     },
     {
-      "description": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
+      "description": "Authentication guard middleware\r\n\r\nVerifies JWT tokens and optionally enforces authorization policies.\r\nInjects verified payload into context as `auth` variable.",
       "id": "chrislyons_dev_flarelette_hono__middleware__authguard",
       "componentId": "chrislyons_dev_flarelette_hono__middleware",
       "name": "authGuard",
       "type": "function",
       "documentation": {
-        "summary": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
+        "summary": "Authentication guard middleware\r\n\r\nVerifies JWT tokens and optionally enforces authorization policies.\r\nInjects verified payload into context as `auth` variable.",
         "examples": [
-          "```typescript\n// Authentication only\napp.get('/protected', authGuard(), async (c) => {\n  const auth = c.get('auth')\n  return c.json({ user: auth.sub })\n})\n\n// With authorization policy\nconst adminPolicy = policy().rolesAny('admin').build()\napp.get('/admin', authGuard(adminPolicy), async (c) => {\n  return c.json({ admin: true })\n})\n```"
+          "```typescript\r\n// Authentication only\r\napp.get('/protected', authGuard(), async (c) => {\r\n  const auth = c.get('auth')\r\n  return c.json({ user: auth.sub })\r\n})\r\n\r\n// With authorization policy\r\nconst adminPolicy = policy().rolesAny('admin').build()\r\napp.get('/admin', authGuard(adminPolicy), async (c) => {\r\n  return c.json({ admin: true })\r\n})\r\n```"
         ]
       },
       "returnType": "MiddlewareHandler<import(\"C:/Users/chris/git/flarelette-hono/src/types\").HonoEnv<T>>",
