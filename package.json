@@ -1,6 +1,6 @@
 {
   "name": "@chrislyons-dev/flarelette-hono",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Type-safe JWT authentication middleware for Hono on Cloudflare Workers",
   "type": "module",
   "main": "./dist/index.js",
