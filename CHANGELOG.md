@@ -1,8 +1,13 @@
 # Changelog
 
-## Unreleased
+## [1.0.1](https://github.com/chrislyons-dev/flarelette-hono/compare/v1.0.0...v1.0.1) (2025-11-04)
 
-### Changed
+
+### Bug Fixes
+
+* configure release-please for manual releases ([#4](https://github.com/chrislyons-dev/flarelette-hono/issues/4)) ([44b38aa](https://github.com/chrislyons-dev/flarelette-hono/commit/44b38aa55ce922a3a3fc2d8e088469e3983fcd89))
+
+## 1.0.0 (2025-11-02)
 
 * **deps:** Updated `@chrislyons-dev/flarelette-jwt` to v1.10.0
   - Adds support for new JWT types and utilities
