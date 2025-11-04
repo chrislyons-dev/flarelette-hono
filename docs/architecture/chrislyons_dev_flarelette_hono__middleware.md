@@ -40,7 +40,7 @@ Provides JWT authentication and authorization for Hono applications on Cloudflar
 ### Code Elements
 
 <details>
-<summary><strong>2 code element(s)</strong></summary>
+<summary><strong>3 code element(s)</strong></summary>
 
 
 
@@ -107,6 +107,44 @@ Injects verified payload into context as `auth` variable.
 **Parameters:**
 
 - `policy`: <code>import("C:/Users/chris/git/flarelette-hono/src/types").Policy</code> — - Optional policy to enforce after authentication
+**Examples:**
+```typescript
+
+```
+
+---
+##### `authGuardWithConfig()`
+
+Authentication guard middleware with explicit configuration
+
+Verifies JWT tokens using explicit configuration objects instead of environment variables.
+This approach is ideal for testing, multi-tenant scenarios, or when you want to avoid
+environment variable dependencies.
+
+<table>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>function</code></td>
+</tr>
+<tr>
+<td><strong>Visibility</strong></td>
+<td><code>public</code></td>
+</tr>
+<tr>
+<td><strong>Returns</strong></td>
+<td><code>MiddlewareHandler<import("C:/Users/chris/git/flarelette-hono/src/types").HonoEnv<T>></code> — Hono middleware handler</td>
+</tr>
+<tr>
+<td><strong>Location</strong></td>
+<td><code>C:/Users/chris/git/flarelette-hono/src/middleware.ts:153</code></td>
+</tr>
+</tbody>
+</table>
+
+**Parameters:**
+
+- `config`: <code>VerifyConfig</code> — - JWT verification configuration (HS512Config or EdDSAVerifyConfig)- `policy`: <code>import("C:/Users/chris/git/flarelette-hono/src/types").Policy</code> — - Optional policy to enforce after authentication
 **Examples:**
 ```typescript
 

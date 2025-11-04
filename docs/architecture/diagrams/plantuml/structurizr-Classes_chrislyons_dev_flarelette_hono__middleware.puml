@@ -23,6 +23,13 @@ skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.middlewareauthGu
   roundCorner 20
   shadowing false
 }
+skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.middlewareauthGuardWithConfig>> {
+  BackgroundColor #85bbf0
+  FontColor #000000
+  BorderColor #5d82a8
+  roundCorner 20
+  shadowing false
+}
 skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono.middlewareextractBearerToken>> {
   BackgroundColor #85bbf0
   FontColor #000000
@@ -39,6 +46,7 @@ skinparam rectangle<<flarelettehono.chrislyonsdevflarelettehono>> {
 rectangle "@chrislyons-dev/flarelette-hono\n<size:10>[Container: Service]</size>" <<flarelettehono.chrislyonsdevflarelettehono>> {
   rectangle "==middleware.extractBearerToken\n<size:10>[Component: function]</size>\n\nExtract Bearer token from Authorization header" <<flarelettehono.chrislyonsdevflarelettehono.middlewareextractBearerToken>> as flarelettehono.chrislyonsdevflarelettehono.middlewareextractBearerToken
   rectangle "==middleware.authGuard\n<size:10>[Component: function]</size>\n\nAuthentication guard middleware Verifies JWT tokens and optionally enforces authorization policies. Injects verified payload into context as `auth` variable." <<flarelettehono.chrislyonsdevflarelettehono.middlewareauthGuard>> as flarelettehono.chrislyonsdevflarelettehono.middlewareauthGuard
+  rectangle "==middleware.authGuardWithConfig\n<size:10>[Component: function]</size>\n\nAuthentication guard middleware with explicit configuration Verifies JWT tokens using explicit configuration objects instead of environment variables. This approach is ideal for testing, multi-tenant scenarios, or when you want to avoid environment variable dependencies." <<flarelettehono.chrislyonsdevflarelettehono.middlewareauthGuardWithConfig>> as flarelettehono.chrislyonsdevflarelettehono.middlewareauthGuardWithConfig
 }
 
 @enduml

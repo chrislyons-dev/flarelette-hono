@@ -50,13 +50,13 @@
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette
 │  ├─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\LICENSE
 │  └─ noticeFile: C:\Users\chris\git\flarelette-hono\node_modules\@chrislyons-dev\archlette\NOTICE
-├─ @chrislyons-dev/flarelette-hono@1.0.0
+├─ @chrislyons-dev/flarelette-hono@1.0.2
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/chrislyons-dev/flarelette-hono
 │  ├─ publisher: Chris Lyons
 │  ├─ path: C:\Users\chris\git\flarelette-hono
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\LICENSE
-├─ @chrislyons-dev/flarelette-jwt@1.10.1
+├─ @chrislyons-dev/flarelette-jwt@1.11.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/chrislyons-dev/flarelette-jwt-kit
 │  ├─ publisher: Chris Lyons

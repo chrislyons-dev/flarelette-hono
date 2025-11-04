@@ -14,11 +14,11 @@
 `flarelette-hono` is the **Hono adapter** for the [`@chrislyons-dev/flarelette-jwt`](https://www.npmjs.com/package/@chrislyons-dev/flarelette-jwt) toolkit.
 It adds route-level middleware, context helpers, and environment injection for a fully self-contained API stack.
 
-| Layer | Responsibility |
-|-------|----------------|
+| Layer                              | Responsibility                                                    |
+| ---------------------------------- | ----------------------------------------------------------------- |
 | **@chrislyons-dev/flarelette-jwt** | Low-level JWT signing, verification, key handling (HS512 + EdDSA) |
-| **flarelette-hono** | Middleware, guards, request/response helpers for Hono |
-| **Your Worker** | Application logic, routes, business rules |
+| **flarelette-hono**                | Middleware, guards, request/response helpers for Hono             |
+| **Your Worker**                    | Application logic, routes, business rules                         |
 
 ---
 
@@ -48,10 +48,11 @@ Everything else (routing, error handling, request/response, middleware chaining)
 
 - **Framework-native**: integrates seamlessly with [Hono](https://hono.dev) on Cloudflare Workers
 - **JWT middleware**: declarative `authGuard(policy)` for route protection
+- **Explicit configuration**: `authGuardWithConfig()` for testing and multi-tenant scenarios
 - **Role/permission policies**: simple fluent builder (`policy().rolesAny().needAll()`)
 - **Env injection**: automatically wires Cloudflare bindings (`env`) into jwt-kit
 - **Framework-agnostic core**: built directly atop `@chrislyons-dev/flarelette-jwt`
-- **Environment-driven**: Configuration via environment variables — no config files required
+- **Dual configuration modes**: Environment-driven or explicit config objects
 - **Type-safe**: 100% TypeScript with strict typing — no `any` types
 
 ---
@@ -118,9 +119,7 @@ Once you understand basic authentication, add role-based access control:
 import { authGuard, policy } from '@chrislyons-dev/flarelette-hono'
 
 // Define a policy
-const analystPolicy = policy()
-  .rolesAny('analyst', 'admin')
-  .needAll('read:reports')
+const analystPolicy = policy().rolesAny('analyst', 'admin').needAll('read:reports')
 
 // Protect a route with policy
 app.get('/reports', authGuard(analystPolicy), async (c) => {
@@ -157,11 +156,11 @@ const createUserSchema = z.object({
 // Apply auth + validation middleware
 app.post(
   '/users',
-  authGuard(policy().rolesAny('admin')),    // JWT auth + policy
-  zValidator('json', createUserSchema),      // Input validation
+  authGuard(policy().rolesAny('admin')), // JWT auth + policy
+  zValidator('json', createUserSchema), // Input validation
   async (c) => {
-    const auth = c.get('auth')               // Typed JWT payload
-    const body = c.req.valid('json')         // Typed validated input
+    const auth = c.get('auth') // Typed JWT payload
+    const body = c.req.valid('json') // Typed validated input
 
     return c.json({ ok: true })
   }
@@ -194,16 +193,14 @@ app.post('/calculate', async (c) => {
   const auth = c.get('auth')
 
   // Structured logging with context
-  logger.info(
-    { userId: auth.sub, operation: 'calculate' },
-    'Processing calculation'
-  )
+  logger.info({ userId: auth.sub, operation: 'calculate' }, 'Processing calculation')
 
   return c.json({ result: 42 })
 })
 ```
 
 **Output (JSON):**
+
 ```json
 {
   "timestamp": "2025-11-02T12:34:56.789Z",
@@ -254,6 +251,99 @@ JWT_AUD = "bond-math.api"
 
 ---
 
+## Explicit Configuration (New!)
+
+The traditional `authGuard()` middleware reads JWT configuration from environment variables (`JWT_ISS`, `JWT_AUD`, `JWT_SECRET_NAME`, etc.). This works well for most cases but can be challenging for:
+
+- **Testing**: Setting up environment variables for unit tests
+- **Multi-tenant apps**: Different JWT configs for different routes
+- **Development**: Avoiding global state mutation
+
+**Solution**: Use `authGuardWithConfig()` with explicit configuration objects:
+
+```typescript
+import { authGuardWithConfig, createHS512Config } from '@chrislyons-dev/flarelette-hono'
+
+// Create explicit JWT configuration
+const config = createHS512Config(
+  'your-base64url-encoded-secret', // Base64url-encoded secret (32+ bytes)
+  {
+    iss: 'https://auth.example.com',
+    aud: 'api.example.com',
+  }
+)
+
+// Use in middleware (no environment variables needed!)
+app.get('/protected', authGuardWithConfig(config), async (c) => {
+  const auth = c.get('auth')
+  return c.json({ user: auth.sub })
+})
+
+// Works with policies too
+const adminPolicy = policy().rolesAny('admin').build()
+app.get('/admin', authGuardWithConfig(config, adminPolicy), async (c) => {
+  return c.json({ admin: true })
+})
+```
+
+### Multi-Tenant Example
+
+Different routes can use different JWT configurations in the same process:
+
+```typescript
+const tenantAConfig = createHS512Config(secretA, {
+  iss: 'https://auth-tenant-a.example.com',
+  aud: 'tenant-a',
+})
+
+const tenantBConfig = createHS512Config(secretB, {
+  iss: 'https://auth-tenant-b.example.com',
+  aud: 'tenant-b',
+})
+
+app.get('/tenant-a/*', authGuardWithConfig(tenantAConfig), tenantAHandlers)
+app.get('/tenant-b/*', authGuardWithConfig(tenantBConfig), tenantBHandlers)
+```
+
+### Testing Benefits
+
+Explicit configuration makes testing much easier:
+
+```typescript
+import { createHS512Config, authGuardWithConfig } from '@chrislyons-dev/flarelette-hono'
+import { SignJWT } from 'jose'
+
+// Test setup (no environment pollution!)
+const testSecret = Buffer.alloc(32, 42).toString('base64url')
+const testConfig = createHS512Config(testSecret, {
+  iss: 'test-issuer',
+  aud: 'test-audience',
+})
+
+// Create test token
+const token = await new SignJWT({ sub: 'test-user' })
+  .setProtectedHeader({ alg: 'HS512' })
+  .setIssuer('test-issuer')
+  .setAudience('test-audience')
+  .setIssuedAt()
+  .setExpirationTime('1h')
+  .sign(Buffer.from(testSecret, 'base64url'))
+
+// Test authenticated request
+const res = await app.request('/protected', {
+  headers: { Authorization: `Bearer ${token}` },
+})
+```
+
+**When to use each approach:**
+
+- **Environment-based (`authGuard`)**: Production deployments, standard Workers with env vars
+- **Explicit config (`authGuardWithConfig`)**: Testing, multi-tenant apps, development, avoiding global state
+
+Both approaches are fully supported and can be mixed in the same application!
+
+---
+
 ### Next Steps
 
 - **Basic usage**: See examples above for authentication and policies
@@ -269,10 +359,10 @@ JWT_AUD = "bond-math.api"
 
 Hono middleware that:
 
-* extracts the `Authorization: Bearer <jwt>` header
-* validates via jwt-kit
-* enforces the given policy (if provided)
-* injects the verified claims into `c.set('auth', payload)`
+- extracts the `Authorization: Bearer <jwt>` header
+- validates via jwt-kit
+- enforces the given policy (if provided)
+- injects the verified claims into `c.set('auth', payload)`
 
 If validation fails → returns `401 Unauthorized` or `403 Forbidden`.
 
@@ -297,8 +387,8 @@ Fluent builder for permission rules:
 
 ```typescript
 policy()
-  .rolesAny('admin', 'analyst')         // At least one role required
-  .rolesAll('verified', 'approved')     // All roles required
+  .rolesAny('admin', 'analyst') // At least one role required
+  .rolesAll('verified', 'approved') // All roles required
   .needAny('read:data', 'read:reports') // At least one permission required
   .needAll('write:reports', 'audit:log') // All permissions required
 ```
@@ -349,9 +439,9 @@ app.get('/data', authGuard(), async (c) => {
 
 ## Testing Tips
 
-* Run integration tests in Miniflare with `JWT_SECRET` or a stubbed resolver
-* Use `@chrislyons-dev/flarelette-jwt` CLI to generate 64-byte secrets for HS512
-* Mock the JWKS resolver in local tests:
+- Run integration tests in Miniflare with `JWT_SECRET` or a stubbed resolver
+- Use `@chrislyons-dev/flarelette-jwt` CLI to generate 64-byte secrets for HS512
+- Mock the JWKS resolver in local tests:
 
   ```typescript
   import { setJwksResolver } from '@chrislyons-dev/flarelette-jwt'
@@ -363,10 +453,10 @@ app.get('/data', authGuard(), async (c) => {
 
 ## Roadmap
 
-* [ ] Optional mTLS / Access integration for external JWKS
-* [ ] KV-backed replay store (`jti`)
-* [ ] Rich error handling hooks (`onUnauthorized`, `onForbidden`)
-* [ ] OpenAPI/Swagger integration
+- [ ] Optional mTLS / Access integration for external JWKS
+- [ ] KV-backed replay store (`jti`)
+- [ ] Rich error handling hooks (`onUnauthorized`, `onForbidden`)
+- [ ] OpenAPI/Swagger integration
 
 ---
 
@@ -375,18 +465,21 @@ app.get('/data', authGuard(), async (c) => {
 JWT authentication and input validation are critical security boundaries. This library prioritizes security over convenience:
 
 ### Authentication Security
+
 - **Fail securely**: Invalid tokens return `401`, insufficient permissions return `403`
 - **No detail leakage**: Error messages never expose token structure or validation details
 - **Short-lived tokens**: 5-15 minute TTL recommended
 - **Audience validation**: Prevents token reuse across services
 
 ### Input Validation Security
+
 - **Validate all input**: Every endpoint that accepts data must validate it
 - **Use Zod**: Type-safe runtime validation prevents injection attacks and type confusion
 - **Constrain everything**: String lengths, array sizes, numeric ranges, formats
 - **Never trust input**: Even from authenticated users
 
 ### Type Safety
+
 - **100% strict TypeScript**: No `any` types throughout the codebase
 - **Runtime + compile-time validation**: Zod provides both type inference and runtime checks
 - **Strong typing prevents vulnerabilities**: Type confusion and injection attacks are mitigated

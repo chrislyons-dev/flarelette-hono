@@ -54,7 +54,7 @@
       "type": "module"
     },
     {
-      "description": "Authentication middleware for Hono\r\n\r\nProvides JWT authentication and authorization for Hono applications on Cloudflare Workers.",
+      "description": "Authentication middleware for Hono\n\nProvides JWT authentication and authorization for Hono applications on Cloudflare Workers.",
       "id": "chrislyons_dev_flarelette_hono__middleware",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "middleware",
@@ -68,7 +68,7 @@
       "type": "module"
     },
     {
-      "description": "Type definitions for flarelette-hono\r\n\r\nRe-exports types from",
+      "description": "Type definitions for flarelette-hono\n\nRe-exports types from",
       "id": "chrislyons_dev_flarelette_hono__types",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "types",
@@ -187,15 +187,15 @@
       "lineNumber": 21
     },
     {
-      "description": "Authentication guard middleware\r\n\r\nVerifies JWT tokens and optionally enforces authorization policies.\r\nInjects verified payload into context as `auth` variable.",
+      "description": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
       "id": "chrislyons_dev_flarelette_hono__middleware__authguard",
       "componentId": "chrislyons_dev_flarelette_hono__middleware",
       "name": "authGuard",
       "type": "function",
       "documentation": {
-        "summary": "Authentication guard middleware\r\n\r\nVerifies JWT tokens and optionally enforces authorization policies.\r\nInjects verified payload into context as `auth` variable.",
+        "summary": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
         "examples": [
-          "```typescript\r\n// Authentication only\r\napp.get('/protected', authGuard(), async (c) => {\r\n  const auth = c.get('auth')\r\n  return c.json({ user: auth.sub })\r\n})\r\n\r\n// With authorization policy\r\nconst adminPolicy = policy().rolesAny('admin').build()\r\napp.get('/admin', authGuard(adminPolicy), async (c) => {\r\n  return c.json({ admin: true })\r\n})\r\n```"
+          "```typescript\n// Authentication only\napp.get('/protected', authGuard(), async (c) => {\n  const auth = c.get('auth')\n  return c.json({ user: auth.sub })\n})\n\n// With authorization policy\nconst adminPolicy = policy().rolesAny('admin').build()\napp.get('/admin', authGuard(adminPolicy), async (c) => {\n  return c.json({ admin: true })\n})\n```"
         ]
       },
       "returnType": "MiddlewareHandler<import(\"C:/Users/chris/git/flarelette-hono/src/types\").HonoEnv<T>>",
@@ -212,6 +212,39 @@
       "isAsync": false,
       "filePath": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
       "lineNumber": 64
+    },
+    {
+      "description": "Authentication guard middleware with explicit configuration\n\nVerifies JWT tokens using explicit configuration objects instead of environment variables.\nThis approach is ideal for testing, multi-tenant scenarios, or when you want to avoid\nenvironment variable dependencies.",
+      "id": "chrislyons_dev_flarelette_hono__middleware__authguardwithconfig",
+      "componentId": "chrislyons_dev_flarelette_hono__middleware",
+      "name": "authGuardWithConfig",
+      "type": "function",
+      "documentation": {
+        "summary": "Authentication guard middleware with explicit configuration\n\nVerifies JWT tokens using explicit configuration objects instead of environment variables.\nThis approach is ideal for testing, multi-tenant scenarios, or when you want to avoid\nenvironment variable dependencies.",
+        "examples": [
+          "```typescript\nimport { authGuardWithConfig, createHS512Config } from '@chrislyons-dev/flarelette-hono'\n\nconst config = createHS512Config({\n  issuer: 'https://auth.example.com',\n  audience: 'api.example.com',\n  secret: 'your-secret-key'\n})\n\n// Authentication only\napp.get('/protected', authGuardWithConfig(config), async (c) => {\n  const auth = c.get('auth')\n  return c.json({ user: auth.sub })\n})\n\n// With authorization policy\nconst adminPolicy = policy().rolesAny('admin').build()\napp.get('/admin', authGuardWithConfig(config, adminPolicy), async (c) => {\n  return c.json({ admin: true })\n})\n```"
+        ]
+      },
+      "returnType": "MiddlewareHandler<import(\"C:/Users/chris/git/flarelette-hono/src/types\").HonoEnv<T>>",
+      "returnDescription": "Hono middleware handler",
+      "parameters": [
+        {
+          "name": "config",
+          "type": "VerifyConfig",
+          "description": "- JWT verification configuration (HS512Config or EdDSAVerifyConfig)",
+          "optional": false
+        },
+        {
+          "name": "policy",
+          "type": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").Policy",
+          "description": "- Optional policy to enforce after authentication",
+          "optional": true
+        }
+      ],
+      "visibility": "public",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "lineNumber": 153
     },
     {
       "description": "Create a new policy builder",
@@ -584,13 +617,13 @@
       "stereotype": "type-import"
     },
     {
-      "description": "imports adapters",
+      "description": "adapters | verifyWithConfig",
       "source": "chrislyons_dev_flarelette_hono__middleware",
       "destination": "@chrislyons-dev/flarelette-jwt",
       "stereotype": "import"
     },
     {
-      "description": "HonoEnv | Policy",
+      "description": "HonoEnv | Policy | VerifyConfig",
       "source": "chrislyons_dev_flarelette_hono__middleware",
       "destination": "./types.js",
       "stereotype": "type-import"
@@ -640,6 +673,12 @@
       "stereotype": "import"
     },
     {
+      "description": "imports verifyWithConfig",
+      "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "destination": "@chrislyons-dev/flarelette-jwt:verifyWithConfig",
+      "stereotype": "import"
+    },
+    {
       "description": "imports HonoEnv",
       "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
       "destination": "./types.js:HonoEnv",
@@ -649,6 +688,12 @@
       "description": "imports Policy",
       "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
       "destination": "./types.js:Policy",
+      "stereotype": "type-import"
+    },
+    {
+      "description": "imports VerifyConfig",
+      "source": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "destination": "./types.js:VerifyConfig",
       "stereotype": "type-import"
     },
     {
