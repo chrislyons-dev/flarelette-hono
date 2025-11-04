@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/chrislyons-dev/flarelette-hono/compare/v1.0.1...v1.0.2) (2025-11-04)
+
+
+### Bug Fixes
+
+* upgrade flarelette-jwt and export new types ([#6](https://github.com/chrislyons-dev/flarelette-hono/issues/6)) ([7595e8e](https://github.com/chrislyons-dev/flarelette-hono/commit/7595e8e3838f15d5f023a2bfefee427f15f68a9d))
+
 ## [1.0.1](https://github.com/chrislyons-dev/flarelette-hono/compare/v1.0.0...v1.0.1) (2025-11-04)
 
 
