@@ -1053,6 +1053,13 @@
 │  ├─ email: i@izs.me
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\read-package-json\node_modules\glob
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\read-package-json\node_modules\glob\LICENSE
+├─ glob@11.0.3
+│  ├─ licenses: ISC
+│  ├─ repository: https://github.com/isaacs/node-glob
+│  ├─ publisher: Isaac Z. Schlueter
+│  ├─ email: i@izs.me
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\node_modules\glob
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\node_modules\glob\LICENSE
 ├─ glob@7.2.3
 │  ├─ licenses: ISC
 │  ├─ repository: https://github.com/isaacs/node-glob
@@ -1307,6 +1314,13 @@
 │  ├─ email: i@izs.me
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\jackspeak
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\jackspeak\LICENSE.md
+├─ jackspeak@4.1.1
+│  ├─ licenses: BlueOak-1.0.0
+│  ├─ repository: https://github.com/isaacs/jackspeak
+│  ├─ publisher: Isaac Z. Schlueter
+│  ├─ email: i@izs.me
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\node_modules\jackspeak
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\node_modules\jackspeak\LICENSE.md
 ├─ jose@5.10.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/panva/jose
@@ -1423,6 +1437,13 @@
 │  ├─ email: i@izs.me
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\path-scurry\node_modules\lru-cache
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\path-scurry\node_modules\lru-cache\LICENSE
+├─ lru-cache@11.2.2
+│  ├─ licenses: ISC
+│  ├─ repository: https://github.com/isaacs/node-lru-cache
+│  ├─ publisher: Isaac Z. Schlueter
+│  ├─ email: i@izs.me
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\node_modules\lru-cache
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\node_modules\lru-cache\LICENSE
 ├─ lru-cache@7.18.3
 │  ├─ licenses: ISC
 │  ├─ repository: https://github.com/isaacs/node-lru-cache
@@ -1726,6 +1747,13 @@
 │  ├─ email: i@izs.me
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\path-scurry
 │  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\path-scurry\LICENSE.md
+├─ path-scurry@2.0.0
+│  ├─ licenses: BlueOak-1.0.0
+│  ├─ repository: https://github.com/isaacs/path-scurry
+│  ├─ publisher: Isaac Z. Schlueter
+│  ├─ email: i@izs.me
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\node_modules\path-scurry
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\node_modules\path-scurry\LICENSE.md
 ├─ path-to-regexp@6.3.0
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/pillarjs/path-to-regexp
@@ -1969,8 +1997,15 @@
 │  ├─ repository: https://github.com/isaacs/rimraf
 │  ├─ publisher: Isaac Z. Schlueter
 │  ├─ email: i@izs.me
+│  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\flat-cache\node_modules\rimraf
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\flat-cache\node_modules\rimraf\LICENSE
+├─ rimraf@6.1.0
+│  ├─ licenses: BlueOak-1.0.0
+│  ├─ repository: https://github.com/isaacs/rimraf
+│  ├─ publisher: Isaac Z. Schlueter
+│  ├─ email: i@izs.me
 │  ├─ path: C:\Users\chris\git\flarelette-hono\node_modules\rimraf
-│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\LICENSE
+│  └─ licenseFile: C:\Users\chris\git\flarelette-hono\node_modules\rimraf\LICENSE.md
 ├─ rollup-plugin-inject@3.0.2
 │  ├─ licenses: MIT
 │  ├─ repository: https://github.com/rollup/rollup-plugin-inject

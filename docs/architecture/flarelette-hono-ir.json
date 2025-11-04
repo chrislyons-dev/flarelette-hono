@@ -40,35 +40,35 @@
   ],
   "components": [
     {
-      "description": "flarelette-hono - Type-safe JWT authentication middleware for Hono\r\n\r\nFramework adapter for Cloudflare Workers built on Hono + Flarelette JWT.\r\nProvides declarative JWT authentication and policy enforcement.",
+      "description": "flarelette-hono - Type-safe JWT authentication middleware for Hono\n\nFramework adapter for Cloudflare Workers built on Hono + Flarelette JWT.\nProvides declarative JWT authentication and policy enforcement.",
       "id": "chrislyons_dev_flarelette_hono__main",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "main",
       "type": "module"
     },
     {
-      "description": "Structured logging for Hono applications\r\n\r\nProvides ADR-0013 compliant structured logging using hono-pino.\r\nThis is a thin wrapper that configures pino with the correct schema\r\nfor polyglot microservice consistency.",
+      "description": "Structured logging for Hono applications\n\nProvides ADR-0013 compliant structured logging using hono-pino.\nThis is a thin wrapper that configures pino with the correct schema\nfor polyglot microservice consistency.",
       "id": "chrislyons_dev_flarelette_hono__logging",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "logging",
       "type": "module"
     },
     {
-      "description": "Authentication middleware for Hono\r\n\r\nProvides JWT authentication and authorization for Hono applications on Cloudflare Workers.",
+      "description": "Authentication middleware for Hono\n\nProvides JWT authentication and authorization for Hono applications on Cloudflare Workers.",
       "id": "chrislyons_dev_flarelette_hono__middleware",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "middleware",
       "type": "module"
     },
     {
-      "description": "Policy builder for declarative JWT authorization\r\n\r\nProvides fluent API for constructing authorization policies based on JWT claims.",
+      "description": "Policy builder for declarative JWT authorization\n\nProvides fluent API for constructing authorization policies based on JWT claims.",
       "id": "chrislyons_dev_flarelette_hono__policy_builder",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "policy-builder",
       "type": "module"
     },
     {
-      "description": "Type definitions for flarelette-hono\r\n\r\nRe-exports types from",
+      "description": "Type definitions for flarelette-hono\n\nRe-exports types from",
       "id": "chrislyons_dev_flarelette_hono__types",
       "containerId": "chrislyons_dev_flarelette_hono",
       "name": "types",
@@ -77,13 +77,13 @@
   ],
   "code": [
     {
-      "description": "Format log level as string (ADR-0013 requirement)\r\n\r\nPino formats levels as numbers by default, but ADR-0013 requires string levels.",
+      "description": "Format log level as string (ADR-0013 requirement)\n\nPino formats levels as numbers by default, but ADR-0013 requires string levels.",
       "id": "chrislyons_dev_flarelette_hono__logging__formatlevel",
       "componentId": "chrislyons_dev_flarelette_hono__logging",
       "name": "formatLevel",
       "type": "function",
       "documentation": {
-        "summary": "Format log level as string (ADR-0013 requirement)\r\n\r\nPino formats levels as numbers by default, but ADR-0013 requires string levels."
+        "summary": "Format log level as string (ADR-0013 requirement)\n\nPino formats levels as numbers by default, but ADR-0013 requires string levels."
       },
       "returnType": "{ level: string; }",
       "returnDescription": "Formatted level object",
@@ -101,13 +101,13 @@
       "lineNumber": 53
     },
     {
-      "description": "Generate ISO 8601 timestamp for logs (ADR-0013 requirement)\r\n\r\nReturns current timestamp in ISO 8601 format with milliseconds,\r\nformatted as a JSON fragment for Pino.",
+      "description": "Generate ISO 8601 timestamp for logs (ADR-0013 requirement)\n\nReturns current timestamp in ISO 8601 format with milliseconds,\nformatted as a JSON fragment for Pino.",
       "id": "chrislyons_dev_flarelette_hono__logging__generatetimestamp",
       "componentId": "chrislyons_dev_flarelette_hono__logging",
       "name": "generateTimestamp",
       "type": "function",
       "documentation": {
-        "summary": "Generate ISO 8601 timestamp for logs (ADR-0013 requirement)\r\n\r\nReturns current timestamp in ISO 8601 format with milliseconds,\r\nformatted as a JSON fragment for Pino."
+        "summary": "Generate ISO 8601 timestamp for logs (ADR-0013 requirement)\n\nReturns current timestamp in ISO 8601 format with milliseconds,\nformatted as a JSON fragment for Pino."
       },
       "returnType": "string",
       "returnDescription": "Formatted timestamp string",
@@ -118,13 +118,13 @@
       "lineNumber": 66
     },
     {
-      "description": "Request ID extractor for correlation (ADR-0013 requirement)\r\n\r\nReturns undefined to let hono-pino automatically extract X-Request-ID header.\r\nThis enables distributed tracing across service boundaries.",
+      "description": "Request ID extractor for correlation (ADR-0013 requirement)\n\nReturns undefined to let hono-pino automatically extract X-Request-ID header.\nThis enables distributed tracing across service boundaries.",
       "id": "chrislyons_dev_flarelette_hono__logging__extractrequestid",
       "componentId": "chrislyons_dev_flarelette_hono__logging",
       "name": "extractRequestId",
       "type": "function",
       "documentation": {
-        "summary": "Request ID extractor for correlation (ADR-0013 requirement)\r\n\r\nReturns undefined to let hono-pino automatically extract X-Request-ID header.\r\nThis enables distributed tracing across service boundaries."
+        "summary": "Request ID extractor for correlation (ADR-0013 requirement)\n\nReturns undefined to let hono-pino automatically extract X-Request-ID header.\nThis enables distributed tracing across service boundaries."
       },
       "returnType": "undefined",
       "returnDescription": "Always undefined (handled by hono-pino)",
@@ -135,16 +135,16 @@
       "lineNumber": 79
     },
     {
-      "description": "Create ADR-0013 compliant structured logger\r\n\r\nReturns a Hono middleware that automatically logs request start/completion\r\nand provides a structured logger instance in the context.\r\n\r\n**ADR-0013 Schema:**\r\n```json\r\n{\r\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\r\n  \"level\": \"info\",\r\n  \"service\": \"bond-valuation\",\r\n  \"requestId\": \"uuid-v4\",\r\n  \"message\": \"Request completed\",\r\n  \"duration\": 125,\r\n  \"method\": \"POST\",\r\n  \"path\": \"/api/price\",\r\n  \"status\": 200\r\n}\r\n```\r\n\r\n**Request Correlation:**\r\nThe logger automatically extracts and propagates `X-Request-ID` header\r\nfor distributed tracing across service boundaries.",
+      "description": "Create ADR-0013 compliant structured logger\n\nReturns a Hono middleware that automatically logs request start/completion\nand provides a structured logger instance in the context.\n\n**ADR-0013 Schema:**\n```json\n{\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\n  \"level\": \"info\",\n  \"service\": \"bond-valuation\",\n  \"requestId\": \"uuid-v4\",\n  \"message\": \"Request completed\",\n  \"duration\": 125,\n  \"method\": \"POST\",\n  \"path\": \"/api/price\",\n  \"status\": 200\n}\n```\n\n**Request Correlation:**\nThe logger automatically extracts and propagates `X-Request-ID` header\nfor distributed tracing across service boundaries.",
       "id": "chrislyons_dev_flarelette_hono__logging__createlogger",
       "componentId": "chrislyons_dev_flarelette_hono__logging",
       "name": "createLogger",
       "type": "function",
       "documentation": {
-        "summary": "Create ADR-0013 compliant structured logger\r\n\r\nReturns a Hono middleware that automatically logs request start/completion\r\nand provides a structured logger instance in the context.\r\n\r\n**ADR-0013 Schema:**\r\n```json\r\n{\r\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\r\n  \"level\": \"info\",\r\n  \"service\": \"bond-valuation\",\r\n  \"requestId\": \"uuid-v4\",\r\n  \"message\": \"Request completed\",\r\n  \"duration\": 125,\r\n  \"method\": \"POST\",\r\n  \"path\": \"/api/price\",\r\n  \"status\": 200\r\n}\r\n```\r\n\r\n**Request Correlation:**\r\nThe logger automatically extracts and propagates `X-Request-ID` header\r\nfor distributed tracing across service boundaries.",
+        "summary": "Create ADR-0013 compliant structured logger\n\nReturns a Hono middleware that automatically logs request start/completion\nand provides a structured logger instance in the context.\n\n**ADR-0013 Schema:**\n```json\n{\n  \"timestamp\": \"2025-11-02T12:34:56.789Z\",\n  \"level\": \"info\",\n  \"service\": \"bond-valuation\",\n  \"requestId\": \"uuid-v4\",\n  \"message\": \"Request completed\",\n  \"duration\": 125,\n  \"method\": \"POST\",\n  \"path\": \"/api/price\",\n  \"status\": 200\n}\n```\n\n**Request Correlation:**\nThe logger automatically extracts and propagates `X-Request-ID` header\nfor distributed tracing across service boundaries.",
         "examples": [
-          "```typescript\r\nimport { Hono } from 'hono'\r\nimport { createLogger } from '@chrislyons-dev/flarelette-hono'\r\n\r\nconst app = new Hono()\r\n\r\n// Add structured logging middleware\r\napp.use('*', createLogger({ service: 'bond-valuation' }))\r\n\r\napp.get('/price', async (c) => {\r\n  // Access logger from context\r\n  c.get('logger').info({ calculation: 'started' }, 'Calculating bond price')\r\n  return c.json({ price: 99.948 })\r\n})\r\n```",
-          "```typescript\r\n// Combine with auth middleware\r\napp.use('*', createLogger({ service: 'my-service' }))\r\napp.use('*', authGuard())\r\n\r\napp.post('/data', async (c) => {\r\n  const logger = c.get('logger')\r\n  const auth = c.get('auth')\r\n\r\n  logger.info({ userId: auth.sub }, 'Processing request')\r\n  return c.json({ ok: true })\r\n})\r\n```"
+          "```typescript\nimport { Hono } from 'hono'\nimport { createLogger } from '@chrislyons-dev/flarelette-hono'\n\nconst app = new Hono()\n\n// Add structured logging middleware\napp.use('*', createLogger({ service: 'bond-valuation' }))\n\napp.get('/price', async (c) => {\n  // Access logger from context\n  c.get('logger').info({ calculation: 'started' }, 'Calculating bond price')\n  return c.json({ price: 99.948 })\n})\n```",
+          "```typescript\n// Combine with auth middleware\napp.use('*', createLogger({ service: 'my-service' }))\napp.use('*', authGuard())\n\napp.post('/data', async (c) => {\n  const logger = c.get('logger')\n  const auth = c.get('auth')\n\n  logger.info({ userId: auth.sub }, 'Processing request')\n  return c.json({ ok: true })\n})\n```"
         ]
       },
       "returnType": "MiddlewareHandler",
@@ -187,15 +187,15 @@
       "lineNumber": 21
     },
     {
-      "description": "Authentication guard middleware\r\n\r\nVerifies JWT tokens and optionally enforces authorization policies.\r\nInjects verified payload into context as `auth` variable.",
+      "description": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
       "id": "chrislyons_dev_flarelette_hono__middleware__authguard",
       "componentId": "chrislyons_dev_flarelette_hono__middleware",
       "name": "authGuard",
       "type": "function",
       "documentation": {
-        "summary": "Authentication guard middleware\r\n\r\nVerifies JWT tokens and optionally enforces authorization policies.\r\nInjects verified payload into context as `auth` variable.",
+        "summary": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
         "examples": [
-          "```typescript\r\n// Authentication only\r\napp.get('/protected', authGuard(), async (c) => {\r\n  const auth = c.get('auth')\r\n  return c.json({ user: auth.sub })\r\n})\r\n\r\n// With authorization policy\r\nconst adminPolicy = policy().rolesAny('admin').build()\r\napp.get('/admin', authGuard(adminPolicy), async (c) => {\r\n  return c.json({ admin: true })\r\n})\r\n```"
+          "```typescript\n// Authentication only\napp.get('/protected', authGuard(), async (c) => {\n  const auth = c.get('auth')\n  return c.json({ user: auth.sub })\n})\n\n// With authorization policy\nconst adminPolicy = policy().rolesAny('admin').build()\napp.get('/admin', authGuard(adminPolicy), async (c) => {\n  return c.json({ admin: true })\n})\n```"
         ]
       },
       "returnType": "MiddlewareHandler<import(\"C:/Users/chris/git/flarelette-hono/src/types\").HonoEnv<T>>",
@@ -222,7 +222,7 @@
       "documentation": {
         "summary": "Create a new policy builder",
         "examples": [
-          "```typescript\r\nconst adminPolicy = policy()\r\n  .rolesAny('admin', 'superuser')\r\n  .needAll('write:users', 'delete:users')\r\n  .build()\r\n```"
+          "```typescript\nconst adminPolicy = policy()\n  .rolesAny('admin', 'superuser')\n  .needAll('write:users', 'delete:users')\n  .build()\n```"
         ]
       },
       "returnType": "import(\"C:/Users/chris/git/flarelette-hono/src/types\").PolicyBuilder",
@@ -234,13 +234,13 @@
       "lineNumber": 199
     },
     {
-      "description": "Concrete policy implementation\r\n\r\nEvaluates rules against JWT payload to determine access.",
+      "description": "Concrete policy implementation\n\nEvaluates rules against JWT payload to determine access.",
       "id": "chrislyons_dev_flarelette_hono__policy_builder__policyimpl",
       "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
       "name": "PolicyImpl",
       "type": "class",
       "documentation": {
-        "summary": "Concrete policy implementation\r\n\r\nEvaluates rules against JWT payload to determine access."
+        "summary": "Concrete policy implementation\n\nEvaluates rules against JWT payload to determine access."
       },
       "visibility": "private",
       "isAbstract": false,
@@ -416,13 +416,13 @@
       }
     },
     {
-      "description": "Policy builder implementation\r\n\r\nFluent API for constructing authorization policies.",
+      "description": "Policy builder implementation\n\nFluent API for constructing authorization policies.",
       "id": "chrislyons_dev_flarelette_hono__policy_builder__policybuilderimpl",
       "componentId": "chrislyons_dev_flarelette_hono__policy_builder",
       "name": "PolicyBuilderImpl",
       "type": "class",
       "documentation": {
-        "summary": "Policy builder implementation\r\n\r\nFluent API for constructing authorization policies."
+        "summary": "Policy builder implementation\n\nFluent API for constructing authorization policies."
       },
       "visibility": "private",
       "isAbstract": false,
