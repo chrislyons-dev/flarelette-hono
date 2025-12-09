@@ -187,6 +187,30 @@
       "lineNumber": 21
     },
     {
+      "description": "Extract raw JWT token from CF-Access-Jwt-Assertion header",
+      "id": "chrislyons_dev_flarelette_hono__middleware__extractcfaccesstoken",
+      "componentId": "chrislyons_dev_flarelette_hono__middleware",
+      "name": "extractCfAccessToken",
+      "type": "function",
+      "documentation": {
+        "summary": "Extract raw JWT token from CF-Access-Jwt-Assertion header"
+      },
+      "returnType": "string",
+      "returnDescription": "Token string if present, null otherwise",
+      "parameters": [
+        {
+          "name": "headerValue",
+          "type": "string",
+          "description": "- CF-Access-Jwt-Assertion header value",
+          "optional": false
+        }
+      ],
+      "visibility": "private",
+      "isAsync": false,
+      "filePath": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
+      "lineNumber": 46
+    },
+    {
       "description": "Authentication guard middleware\n\nVerifies JWT tokens and optionally enforces authorization policies.\nInjects verified payload into context as `auth` variable.",
       "id": "chrislyons_dev_flarelette_hono__middleware__authguard",
       "componentId": "chrislyons_dev_flarelette_hono__middleware",
@@ -211,7 +235,7 @@
       "visibility": "public",
       "isAsync": false,
       "filePath": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
-      "lineNumber": 64
+      "lineNumber": 90
     },
     {
       "description": "Authentication guard middleware with explicit configuration\n\nVerifies JWT tokens using explicit configuration objects instead of environment variables.\nThis approach is ideal for testing, multi-tenant scenarios, or when you want to avoid\nenvironment variable dependencies.",
@@ -244,7 +268,7 @@
       "visibility": "public",
       "isAsync": false,
       "filePath": "C:/Users/chris/git/flarelette-hono/src/middleware.ts",
-      "lineNumber": 153
+      "lineNumber": 188
     },
     {
       "description": "Create a new policy builder",

@@ -40,7 +40,7 @@ Provides JWT authentication and authorization for Hono applications on Cloudflar
 ### Code Elements
 
 <details>
-<summary><strong>3 code element(s)</strong></summary>
+<summary><strong>4 code element(s)</strong></summary>
 
 
 
@@ -76,6 +76,36 @@ Extract Bearer token from Authorization header
 - `authHeader`: <code>string</code> — - Authorization header value
 
 ---
+##### `extractCfAccessToken()`
+
+Extract raw JWT token from CF-Access-Jwt-Assertion header
+
+<table>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td><code>function</code></td>
+</tr>
+<tr>
+<td><strong>Visibility</strong></td>
+<td><code>private</code></td>
+</tr>
+<tr>
+<td><strong>Returns</strong></td>
+<td><code>string</code> — Token string if present, null otherwise</td>
+</tr>
+<tr>
+<td><strong>Location</strong></td>
+<td><code>C:/Users/chris/git/flarelette-hono/src/middleware.ts:46</code></td>
+</tr>
+</tbody>
+</table>
+
+**Parameters:**
+
+- `headerValue`: <code>string</code> — - CF-Access-Jwt-Assertion header value
+
+---
 ##### `authGuard()`
 
 Authentication guard middleware
@@ -99,7 +129,7 @@ Injects verified payload into context as `auth` variable.
 </tr>
 <tr>
 <td><strong>Location</strong></td>
-<td><code>C:/Users/chris/git/flarelette-hono/src/middleware.ts:64</code></td>
+<td><code>C:/Users/chris/git/flarelette-hono/src/middleware.ts:90</code></td>
 </tr>
 </tbody>
 </table>
@@ -137,7 +167,7 @@ environment variable dependencies.
 </tr>
 <tr>
 <td><strong>Location</strong></td>
-<td><code>C:/Users/chris/git/flarelette-hono/src/middleware.ts:153</code></td>
+<td><code>C:/Users/chris/git/flarelette-hono/src/middleware.ts:188</code></td>
 </tr>
 </tbody>
 </table>

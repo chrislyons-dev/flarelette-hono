@@ -87,7 +87,8 @@ JWT_SECRET_NAME = "INTERNAL_JWT_SECRET"
 Generate and store secret:
 
 ```bash
-openssl rand -base64 48 | wrangler secret put INTERNAL_JWT_SECRET
+# IMPORTANT: v1.13+ requires 64-byte minimum for HS512
+npx flarelette-jwt-secret --len=64 | wrangler secret put INTERNAL_JWT_SECRET
 ```
 
 ### 3. Minimal Example (Authentication Only)
@@ -344,6 +345,189 @@ Both approaches are fully supported and can be mixed in the same application!
 
 ---
 
+## Gateway and Service Mesh Architecture
+
+Typical flarelette deployments use a **gateway pattern** where external OIDC tokens are verified at the gateway, which then mints internal tokens for the service mesh.
+
+**Both gateway and internal services use `flarelette-hono`** — the only difference is the **JWKS resolution strategy**:
+
+| Component | JWKS Source | Purpose |
+|-----------|-------------|---------|
+| **Gateway** | `JWT_JWKS_URL` (HTTP) | Verify external OIDC tokens (Auth0, Okta, CF Access) |
+| **Internal Services** | `JWT_JWKS_SERVICE_NAME` (binding) | Verify internal tokens from gateway (fast RPC) |
+
+### Gateway Example
+
+```typescript
+import { Hono } from 'hono'
+import { authGuard } from '@chrislyons-dev/flarelette-hono'
+import { sign } from '@chrislyons-dev/flarelette-jwt'
+import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
+
+const app = new Hono<HonoEnv>()
+
+// Verify external OIDC tokens via JWT_JWKS_URL
+app.post('/token-exchange', authGuard(), async (c) => {
+  const externalAuth = c.get('auth')
+
+  // Mint internal token for service mesh
+  const internalToken = await sign({
+    sub: externalAuth.sub,
+    email: externalAuth.email,
+    roles: deriveRoles(externalAuth),
+    permissions: derivePermissions(externalAuth)
+  })
+
+  return c.json({ token: internalToken })
+})
+```
+
+```toml
+# Gateway wrangler.toml
+[vars]
+JWT_ISS = "https://auth0.example.com/"
+JWT_AUD = "my-app-client-id"
+JWT_JWKS_URL = "https://auth0.example.com/.well-known/jwks.json"
+
+# For minting internal tokens
+JWT_PRIVATE_JWK_NAME = "GATEWAY_PRIVATE_KEY"
+```
+
+### Internal Service Example
+
+```typescript
+import { Hono } from 'hono'
+import { authGuard } from '@chrislyons-dev/flarelette-hono'
+import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
+
+const app = new Hono<HonoEnv>()
+
+// Verify internal tokens via service binding
+app.get('/data', authGuard(), async (c) => {
+  const auth = c.get('auth')
+  return c.json({ data: [], user: auth.sub })
+})
+```
+
+```toml
+# Service wrangler.toml
+[[services]]
+binding = "GATEWAY"
+service = "jwt-gateway"
+
+[vars]
+JWT_ISS = "https://gateway.internal"
+JWT_AUD = "bond-math.api"
+JWT_JWKS_SERVICE_NAME = "GATEWAY"
+```
+
+**See [Configuration Guide](docs/getting-started/configuration.md#gateway-and-service-mesh-architecture) for complete examples.**
+
+---
+
+## Cloudflare Access Integration
+
+Workers behind [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/) can authenticate users via the `CF-Access-Jwt-Assertion` header. This header contains a JWT issued by Cloudflare after successful authentication.
+
+**Note:** Cloudflare Access uses **standard JWKS format** (RFC 7517) but with a non-standard path (`/cdn-cgi/access/certs`). It does not provide an OIDC discovery endpoint. This is fine — `authGuard()` supports direct JWKS URLs.
+
+### How It Works
+
+Cloudflare Access acts as an authentication layer before requests reach your Worker:
+
+1. User authenticates via Access (SSO, OIDC, etc.)
+2. Cloudflare injects `CF-Access-Jwt-Assertion` header with signed JWT
+3. Your Worker validates the JWT using `authGuard()`
+
+**No code changes required** — `authGuard()` automatically checks both `Authorization` and `CF-Access-Jwt-Assertion` headers.
+
+### Header Precedence
+
+When both headers are present, `Authorization` takes priority:
+
+```typescript
+// Authorization header is checked first
+// CF-Access-Jwt-Assertion is used as fallback if Authorization is missing or invalid
+```
+
+This allows you to:
+- Use Cloudflare Access for browser-based users (`CF-Access-Jwt-Assertion`)
+- Use API tokens for service-to-service calls (`Authorization: Bearer`)
+
+### Configuration
+
+Configure `authGuard()` to verify Cloudflare Access JWTs:
+
+```typescript
+import { authGuard } from '@chrislyons-dev/flarelette-hono'
+import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
+
+const app = new Hono<HonoEnv>()
+
+// Works with both Authorization and CF-Access-Jwt-Assertion headers
+app.get('/protected', authGuard(), async (c) => {
+  const auth = c.get('auth')
+  return c.json({ user: auth.sub, email: auth.email })
+})
+```
+
+**Environment variables:**
+
+```toml
+# wrangler.toml
+[vars]
+JWT_ISS = "https://your-team.cloudflareaccess.com"  # Cloudflare Access issuer
+JWT_AUD = "your-application-aud-tag"                # Application audience tag
+```
+
+Get your team domain and audience tag from the [Cloudflare Zero Trust dashboard](https://one.dash.cloudflare.com/).
+
+### Verify Cloudflare Access Tokens
+
+Set up JWKS verification for Cloudflare Access public keys:
+
+```toml
+# wrangler.toml
+[vars]
+JWT_ISS = "https://your-team.cloudflareaccess.com"
+JWT_AUD = "your-application-aud-tag"
+
+# JWKS URL is a public endpoint - no need for secret
+JWT_JWKS_URL = "https://your-team.cloudflareaccess.com/cdn-cgi/access/certs"
+```
+
+**Security note:** Cloudflare Access uses short-lived JWTs (typically 1 hour). Set appropriate `JWT_LEEWAY` to handle clock skew.
+
+### Mixed Authentication Example
+
+Support both Cloudflare Access (browser) and API tokens (service-to-service):
+
+```typescript
+// Browser users → Cloudflare Access → CF-Access-Jwt-Assertion header
+// API clients → Direct token → Authorization: Bearer header
+
+app.get('/data', authGuard(), async (c) => {
+  const auth = c.get('auth')
+
+  // Both authentication methods provide the same JwtPayload structure
+  return c.json({
+    user: auth.sub,
+    email: auth.email,
+    source: c.req.header('CF-Access-Jwt-Assertion') ? 'access' : 'api'
+  })
+})
+```
+
+### Limitations
+
+- **Same JWT structure required**: Both authentication methods must use compatible JWT payloads
+- **Single issuer**: `JWT_ISS` applies to both Authorization and CF-Access tokens
+- **No automatic header selection**: Use header precedence (Authorization first) rather than route-based selection
+
+For separate issuers or different JWT structures, use `authGuardWithConfig()` on different route groups.
+
+---
+
 ### Next Steps
 
 - **Basic usage**: See examples above for authentication and policies
@@ -359,10 +543,12 @@ Both approaches are fully supported and can be mixed in the same application!
 
 Hono middleware that:
 
-- extracts the `Authorization: Bearer <jwt>` header
+- extracts JWT from `Authorization: Bearer <jwt>` or `CF-Access-Jwt-Assertion` header
 - validates via jwt-kit
 - enforces the given policy (if provided)
 - injects the verified claims into `c.set('auth', payload)`
+
+**Header Precedence:** `Authorization` is checked first; `CF-Access-Jwt-Assertion` is used as fallback.
 
 If validation fails → returns `401 Unauthorized` or `403 Forbidden`.
 
@@ -415,14 +601,15 @@ app.get('/data', authGuard(), async (c) => {
 
 ## Configuration (shared with jwt-kit)
 
-| Variable                                   | Description                                    |
-| ------------------------------------------ | ---------------------------------------------- |
-| `JWT_ISS`, `JWT_AUD`                       | Expected issuer & audience                     |
-| `JWT_TTL_SECONDS`, `JWT_LEEWAY`            | Defaults: 900 / 90                             |
-| `JWT_SECRET_NAME` / `JWT_SECRET`           | HS512 secret                                   |
-| `JWT_PRIVATE_JWK_NAME` / `JWT_PRIVATE_JWK` | EdDSA signing key (gateway)                    |
-| `JWT_JWKS_URL_NAME` / `JWT_JWKS_URL`       | EdDSA verification (URL mode)                  |
-| `setJwksResolver()`                        | For internal Service Bindings (no public JWKS) |
+| Variable                                   | Description                                             |
+| ------------------------------------------ | ------------------------------------------------------- |
+| `JWT_ISS`, `JWT_AUD`                       | Expected issuer & audience                              |
+| `JWT_TTL_SECONDS`, `JWT_LEEWAY`            | Defaults: 900 / 90                                      |
+| `JWT_SECRET_NAME` / `JWT_SECRET`           | HS512 secret                                            |
+| `JWT_PRIVATE_JWK_NAME` / `JWT_PRIVATE_JWK` | EdDSA signing key (gateway)                             |
+| `JWT_JWKS_URL`                             | JWKS endpoint (public URL, use for OIDC/Access)         |
+| `JWT_JWKS_URL_NAME`                        | Secret name containing JWKS URL (rarely needed)         |
+| `setJwksResolver()`                        | For internal Service Bindings (no public JWKS endpoint) |
 
 ---
 
@@ -464,12 +651,53 @@ app.get('/data', authGuard(), async (c) => {
 
 JWT authentication and input validation are critical security boundaries. This library prioritizes security over convenience:
 
+### Security Requirements (v1.13+)
+
+#### HS512 Secret Minimum Length ⚠️
+
+**CRITICAL:** As of flarelette-jwt v1.13, HS512 secrets must be **at minimum 64 bytes** (512 bits). Shorter secrets will cause configuration errors at startup.
+
+**Generate secure secrets:**
+```bash
+# Required: 64-byte minimum for HS512
+npx flarelette-jwt-secret --len=64
+```
+
+**Why 64 bytes?**
+- Matches SHA-512 digest size (512 bits)
+- Prevents brute-force attacks on weak secrets
+- Industry best practice for HMAC-SHA-512
+- **Breaking change from v1.12 and earlier**
+
+**Error if secret too short:**
+```
+Error: JWT secret too short: 32 bytes, need >= 64 for HS512 (use 'npx flarelette-jwt-secret --len=64')
+```
+
+#### Mode Exclusivity (Algorithm Confusion Prevention)
+
+**CRITICAL:** You **cannot** configure both HS512 and asymmetric (EdDSA/RSA) modes simultaneously. This prevents algorithm confusion attacks (CVE-2015-9235).
+
+**Choose ONE mode:**
+- ✅ **HS512**: `JWT_SECRET_NAME` or `JWT_SECRET`
+- ✅ **EdDSA**: `JWT_PRIVATE_JWK_NAME` + `JWT_PUBLIC_JWK_NAME`
+- ✅ **RSA (external OIDC)**: `JWT_JWKS_URL`
+- ❌ **HS512 + EdDSA**: Configuration error
+
+**Error if both configured:**
+```
+Configuration error: Both HS512 (JWT_SECRET) and asymmetric (JWT_PUBLIC_JWK/JWT_JWKS_*) secrets configured. Choose one to prevent algorithm confusion attacks.
+```
+
 ### Authentication Security
 
 - **Fail securely**: Invalid tokens return `401`, insufficient permissions return `403`
 - **No detail leakage**: Error messages never expose token structure or validation details
 - **Short-lived tokens**: 5-15 minute TTL recommended
 - **Audience validation**: Prevents token reuse across services
+- **Algorithm whitelisting**: HS512 mode only allows `['HS512']`, EdDSA/RSA mode only allows `['EdDSA', 'RS256', 'RS384', 'RS512']`
+- **No `alg: none`**: The `none` algorithm is never supported (CVE-2015-2951)
+- **JWKS injection prevention**: JWKS URLs pinned in config, never read from token headers
 
 ### Input Validation Security
 
@@ -484,7 +712,7 @@ JWT authentication and input validation are critical security boundaries. This l
 - **Runtime + compile-time validation**: Zod provides both type inference and runtime checks
 - **Strong typing prevents vulnerabilities**: Type confusion and injection attacks are mitigated
 
-See [JWT Integration Guide](docs/jwt-integration.md) and [Input Validation Guide](docs/validation.md) for detailed security considerations.
+See [JWT Integration Guide](docs/design/jwt-integration.md) for detailed security considerations and the [flarelette-jwt Security Guide](https://github.com/chrislyons-dev/flarelette-jwt-kit/blob/main/docs/security-guide.md) for complete cryptographic details.
 
 ---
 

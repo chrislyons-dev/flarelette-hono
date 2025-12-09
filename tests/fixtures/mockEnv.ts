@@ -14,7 +14,9 @@ import type { WorkerEnv } from '@chrislyons-dev/flarelette-jwt'
  */
 export function createMockEnv(overrides?: Partial<WorkerEnv>): WorkerEnv {
   // Generate a 64-byte (512-bit) secret for HS512
-  const defaultSecret = 'a'.repeat(64)
+  // JWT_SECRET must be base64url-encoded (per flarelette-jwt usage guide)
+  const rawSecret = Buffer.from('a'.repeat(64), 'utf-8')
+  const defaultSecret = rawSecret.toString('base64url')
 
   return {
     JWT_ISS: 'https://test.internal',

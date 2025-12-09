@@ -62,6 +62,11 @@ workspace "flarelette-hono" "Type-safe JWT authentication middleware for Hono on
                     technology "function"
                     tags "Code"
                 }
+                chrislyons_dev_flarelette_hono__middleware__extractcfaccesstoken = component "middleware.extractCfAccessToken" {
+                    description "Extract raw JWT token from CF-Access-Jwt-Assertion header"
+                    technology "function"
+                    tags "Code"
+                }
                 chrislyons_dev_flarelette_hono__middleware__authguard = component "middleware.authGuard" {
                     description "Authentication guard middleware Verifies JWT tokens and optionally enforces authorization policies. Injects verified payload into context as `auth` variable."
                     technology "function"
@@ -381,6 +386,7 @@ branding {
 
         component chrislyons_dev_flarelette_hono "Classes_chrislyons_dev_flarelette_hono__middleware" {
             include chrislyons_dev_flarelette_hono__middleware__extractbearertoken
+            include chrislyons_dev_flarelette_hono__middleware__extractcfaccesstoken
             include chrislyons_dev_flarelette_hono__middleware__authguard
             include chrislyons_dev_flarelette_hono__middleware__authguardwithconfig
             autoLayout

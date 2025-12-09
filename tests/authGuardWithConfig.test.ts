@@ -14,8 +14,8 @@ import { SignJWT } from 'jose'
 describe('authGuardWithConfig middleware', () => {
   let app: Hono<HonoEnv>
   let config: HS512Config
-  // Create a 32-byte secret and encode as base64url
-  const secretBytes = Buffer.alloc(32, 42) // Fill with value 42
+  // Create a 64-byte secret for HS512 and encode as base64url
+  const secretBytes = Buffer.alloc(64, 42) // Fill with value 42
   const secret = secretBytes.toString('base64url')
   const secretKey = new Uint8Array(secretBytes)
   const issuer = 'https://auth.test.example.com'
@@ -103,7 +103,7 @@ describe('authGuardWithConfig middleware', () => {
       const body = await res.json()
       expect(body).toEqual({
         error: 'unauthorized',
-        message: 'Missing or invalid Authorization header',
+        message: 'Missing or invalid Authorization or CF-Access-Jwt-Assertion header',
       })
     })
 
@@ -308,9 +308,9 @@ describe('authGuardWithConfig middleware', () => {
   describe('multiple configs in same process', () => {
     it('should support different configs for different routes', async () => {
       // Create secrets for both services
-      const secretBytesA = Buffer.alloc(32, 10)
+      const secretBytesA = Buffer.alloc(64, 10)
       const secretA = secretBytesA.toString('base64url')
-      const secretBytesB = Buffer.alloc(32, 20)
+      const secretBytesB = Buffer.alloc(64, 20)
       const secretB = secretBytesB.toString('base64url')
 
       // Config for service A
@@ -402,9 +402,9 @@ describe('authGuardWithConfig middleware', () => {
 
     it('should not interfere with other explicit configs', async () => {
       // Create secrets for both configs
-      const secretBytes1 = Buffer.alloc(32, 30)
+      const secretBytes1 = Buffer.alloc(64, 30)
       const secret1 = secretBytes1.toString('base64url')
-      const secretBytes2 = Buffer.alloc(32, 40)
+      const secretBytes2 = Buffer.alloc(64, 40)
       const secret2 = secretBytes2.toString('base64url')
 
       const config1 = createHS512Config(secret1, {

@@ -55,15 +55,22 @@ function authGuard(policy?: Policy): MiddlewareHandler<HonoEnv>
 
 **Behavior:**
 
-1. Extract `Bearer` token from `Authorization` header
+1. Extract token from `Authorization: Bearer <jwt>` or `CF-Access-Jwt-Assertion` header
 2. Verify token using `@chrislyons-dev/flarelette-jwt`
 3. If valid and policy passes: store claims in `c.set('auth', payload)`, call next handler
 4. If invalid/missing: return 401 Unauthorized
 5. If policy fails: return 403 Forbidden
 
+**Header Precedence:**
+
+- `Authorization: Bearer <token>` is checked first
+- `CF-Access-Jwt-Assertion: <token>` is used as fallback if Authorization is missing or invalid
+
+This allows Workers behind [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/) to authenticate users via the CF-Access-Jwt-Assertion header, while still supporting standard Bearer tokens for API clients.
+
 **Error Responses:**
 
-- Missing `Authorization` header → 401
+- Missing both `Authorization` and `CF-Access-Jwt-Assertion` headers → 401
 - Invalid/malformed token → 401
 - Expired token → 401
 - Wrong audience → 401
@@ -101,6 +108,33 @@ api.get('/data', async (c) => {
 })
 
 app.route('/api', api)
+```
+
+**Cloudflare Access Example:**
+
+```typescript
+// Worker behind Cloudflare Access - no code changes required
+app.get('/dashboard', authGuard(), async (c) => {
+  const auth = c.get('auth')
+
+  // Token extracted from CF-Access-Jwt-Assertion header
+  // Payload contains Cloudflare Access claims (sub, email, groups, etc.)
+  return c.json({
+    user: auth.sub,
+    email: auth.email,
+    source: 'cloudflare-access'
+  })
+})
+
+// Mixed authentication - supports both Access and API tokens
+app.get('/api/data', authGuard(), async (c) => {
+  const auth = c.get('auth')
+
+  // Works with:
+  // - Authorization: Bearer <token> (API clients)
+  // - CF-Access-Jwt-Assertion: <token> (Cloudflare Access)
+  return c.json({ data: [], user: auth.sub })
+})
 ```
 
 ---

@@ -29,12 +29,21 @@ app.get('/protected', authGuard(), async (c) => {
 
 ### 1. Token Extraction
 
-`authGuard()` extracts the JWT from the `Authorization` header:
+`authGuard()` extracts the JWT from either:
 
+- `Authorization` header (standard Bearer token):
 ```http
 GET /protected HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9...
 ```
+
+- `CF-Access-Jwt-Assertion` header (Cloudflare Access):
+```http
+GET /protected HTTP/1.1
+CF-Access-Jwt-Assertion: eyJhbGciOiJFZERTQSIsImtpZCI6IjEyMyIsInR5cCI6IkpXVCJ9...
+```
+
+**Header precedence:** `Authorization` is checked first; `CF-Access-Jwt-Assertion` is used as fallback if Authorization is missing or invalid.
 
 ### 2. Token Verification
 
@@ -195,7 +204,108 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 ---
 
+## Cloudflare Access Integration
+
+Workers behind [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/) automatically receive authenticated user context via the `CF-Access-Jwt-Assertion` header.
+
+### What is Cloudflare Access?
+
+Cloudflare Access provides zero-trust authentication for your applications:
+- SSO integration (Google, GitHub, Okta, etc.)
+- Managed authentication layer before requests reach your Worker
+- Automatic JWT generation and validation
+
+### Setup
+
+**1. Configure Cloudflare Access** in the [Zero Trust dashboard](https://one.dash.cloudflare.com/)
+
+**2. Configure your Worker:**
+
+```toml
+# wrangler.toml
+[vars]
+JWT_ISS = "https://your-team.cloudflareaccess.com"
+JWT_AUD = "your-application-aud-tag"
+
+# JWKS URL is a public endpoint - no need for secret
+JWT_JWKS_URL = "https://your-team.cloudflareaccess.com/cdn-cgi/access/certs"
+```
+
+**3. Use `authGuard()` normally — no code changes required:**
+
+```typescript
+app.get('/dashboard', authGuard(), async (c) => {
+  const auth = c.get('auth')
+
+  // Token extracted from CF-Access-Jwt-Assertion header
+  return c.json({
+    user: auth.sub,
+    email: auth.email,
+    groups: auth.groups  // Cloudflare Access groups
+  })
+})
+```
+
+### Mixed Authentication
+
+Support both Cloudflare Access (browser users) and API tokens (service-to-service):
+
+```typescript
+app.get('/data', authGuard(), async (c) => {
+  const auth = c.get('auth')
+
+  // Works with both:
+  // - CF-Access-Jwt-Assertion (browser users via Access)
+  // - Authorization: Bearer <token> (API clients)
+
+  const source = c.req.header('CF-Access-Jwt-Assertion') ? 'access' : 'api'
+
+  return c.json({
+    data: [],
+    user: auth.sub,
+    source
+  })
+})
+```
+
+### Security Considerations
+
+- **Token lifetime**: Cloudflare Access tokens typically expire after 1 hour
+- **Clock skew**: Set `JWT_LEEWAY_SECONDS=300` (5 minutes) to handle timing differences
+- **JWKS caching**: Public keys are cached for 5 minutes; rotation is handled automatically
+- **Header precedence**: `Authorization` takes priority over `CF-Access-Jwt-Assertion`
+
+### Troubleshooting
+
+**401 Unauthorized errors:**
+
+1. Verify issuer matches your team domain:
+   ```bash
+   # Should match JWT_ISS
+   curl https://your-team.cloudflareaccess.com/cdn-cgi/access/certs | jq '.keys[0]'
+   ```
+
+2. Check application AUD tag in Access policy settings
+
+3. Ensure JWKS URL is accessible:
+   ```bash
+   curl https://your-team.cloudflareaccess.com/cdn-cgi/access/certs
+   ```
+
+**Missing user context:**
+
+Cloudflare Access JWT claims vary by identity provider. Common claims:
+- `sub` - User identifier (always present)
+- `email` - User email (most providers)
+- `name` - Display name (some providers)
+- `groups` - Access groups (if configured)
+
+Always check for `undefined` before using optional claims.
+
+---
+
 ## Next Steps
 
 - **Add authorization**: See [Authorization Guide](authorization.md) for role-based and permission-based policies
 - **Understand JWT structure**: See [JWT Integration Guide](../design/jwt-integration.md) for complete JWT payload structure and production setup
+- **Cloudflare Access docs**: See [Cloudflare Access documentation](https://developers.cloudflare.com/cloudflare-one/policies/access/) for identity provider configuration
