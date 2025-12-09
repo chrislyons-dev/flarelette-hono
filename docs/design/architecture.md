@@ -153,11 +153,15 @@ Instead, `flarelette-hono` **extends** Hono with the specific features needed fo
 
 **Responsibilities:**
 
-- Extract `Authorization: Bearer <jwt>` header
+- Extract JWT from `Authorization: Bearer <jwt>` or `CF-Access-Jwt-Assertion` header
 - Delegate verification to `@chrislyons-dev/flarelette-jwt`
 - Enforce policy (if provided)
 - Inject verified claims into Hono context
 - Return 401/403 on failure
+
+**Header Precedence:**
+- `Authorization: Bearer <token>` (checked first)
+- `CF-Access-Jwt-Assertion: <token>` (fallback for Cloudflare Access)
 
 **Type Signature:**
 
@@ -290,17 +294,32 @@ app.get('/protected', authGuard(), async (c) => {
 
 ## JWT Integration Architecture
 
+### Gateway and Service Mesh Pattern
+
+**CRITICAL:** Both gateway and internal services use `flarelette-hono`. The only difference is the **JWKS resolution strategy**:
+
+- **Gateway**: Uses `JWT_JWKS_URL` (HTTP) to verify external OIDC tokens
+- **Internal Services**: Use `JWT_JWKS_SERVICE_NAME` (service binding) to verify internal tokens
+
+| Aspect | Gateway Worker | Internal Service |
+|--------|----------------|------------------|
+| **Middleware** | ✅ `authGuard()` from flarelette-hono | ✅ `authGuard()` from flarelette-hono |
+| **JWKS Source** | `JWT_JWKS_URL` (HTTP to Auth0/Okta/CF Access) | `JWT_JWKS_SERVICE_NAME` (service binding) |
+| **Purpose** | Verify external OIDC, mint internal tokens | Verify internal tokens |
+| **Performance** | ~50-100ms (HTTP JWKS fetch + cache) | ~1-5ms (service binding) |
+
 ### Token Flow (RFC 8693 Pattern)
 
 ```
 External Client
     │
-    │ (Bearer <Auth0 token>)
+    │ (Bearer <Auth0/OIDC token>)
     ▼
 ┌─────────────────────┐
 │   Gateway Worker    │
+│  (flarelette-hono)  │
 │                     │
-│ 1. Verify external  │
+│ 1. authGuard()      │ ← Verifies via JWT_JWKS_URL (HTTP)
 │ 2. Token exchange   │
 │ 3. Mint internal    │
 └─────────────────────┘
@@ -310,9 +329,9 @@ External Client
     ▼
 ┌─────────────────────┐
 │  Service Worker     │
-│  (using flarelette) │
+│  (flarelette-hono)  │
 │                     │
-│ 1. authGuard()      │
+│ 1. authGuard()      │ ← Verifies via JWT_JWKS_SERVICE_NAME (binding)
 │ 2. Extract actor    │
 │ 3. Check policy     │
 │ 4. Business logic   │
@@ -354,25 +373,29 @@ External Client
 
 **Environment Variables:**
 
-**Gateway (Token Producer):**
+**Gateway (Verify External OIDC, Mint Internal Tokens):**
 
 ```bash
-# EdDSA Configuration (preferred)
+# External OIDC verification (HTTP JWKS)
+JWT_ISS=https://auth0.example.com/        # External OIDC issuer
+JWT_AUD=my-app-client-id                  # External OIDC audience
+JWT_JWKS_URL=https://auth0.example.com/.well-known/jwks.json  # Public JWKS URL
+JWT_LEEWAY_SECONDS=300                    # Clock skew tolerance (5 min)
+
+# For minting internal tokens (EdDSA preferred)
 JWT_PRIVATE_JWK_NAME=GATEWAY_PRIVATE_KEY  # Secret binding name
 JWT_KID=gateway-key-2025-11               # Key ID
-JWT_ALG=EdDSA                             # Auto-detected
 
-# OR HS512 Configuration (fallback)
+# OR HS512 for minting (fallback)
 JWT_SECRET_NAME=GATEWAY_JWT_SECRET        # Secret binding name
-JWT_ALG=HS512                             # Auto-detected
 
-# Common Configuration
-JWT_ISS=https://gateway.internal          # Issuer
-JWT_AUD=bond-math.api                     # Audience (mesh or service)
+# Internal token settings
+# JWT_ISS=https://gateway.internal        # Set dynamically in code
+# JWT_AUD=bond-math.api                   # Set dynamically in code
 JWT_TTL_SECONDS=900                       # 15 minutes
 ```
 
-**Service (Token Consumer):**
+**Internal Service (Verify Internal Tokens):**
 
 ```bash
 # EdDSA Configuration (preferred)
@@ -386,7 +409,7 @@ JWT_ALLOWED_THUMBPRINTS=abc123,def456     # Key pinning (optional)
 JWT_SECRET_NAME=INTERNAL_JWT_SECRET       # Secret binding name
 
 # Common Configuration
-JWT_ISS=https://gateway.internal          # Expected issuer
+JWT_ISS=https://gateway.internal          # Expected issuer (from gateway)
 JWT_AUD=bond-math.api                     # Expected audience
 JWT_LEEWAY_SECONDS=90                     # Clock skew tolerance
 ```
@@ -400,11 +423,23 @@ JWT_LEEWAY_SECONDS=90                     # Clock skew tolerance
 
 ### JWKS Resolution Strategy
 
-**Priority Order:**
+**Priority Order (Internal Services):**
 
 1. **Service Binding** (preferred): `env.GATEWAY.fetch('/.well-known/jwks.json')`
 2. **Inline Public Key**: `JWT_PUBLIC_JWK` environment variable
-3. **HTTP JWKS URL**: `JWT_JWKS_URL` with caching
+3. **HTTP JWKS URL**: `JWT_JWKS_URL` with caching (for gateway)
+
+**Gateway Uses HTTP JWKS:**
+
+- Gateway verifies external OIDC tokens via `JWT_JWKS_URL`
+- Points to Auth0, Okta, Google, Azure AD, or Cloudflare Access JWKS endpoints
+- Example: `JWT_JWKS_URL=https://auth0.example.com/.well-known/jwks.json`
+
+**Internal Services Use Service Bindings:**
+
+- Services verify internal tokens via `JWT_JWKS_SERVICE_NAME`
+- Points to gateway's JWKS endpoint via Worker-to-Worker RPC
+- Example: `JWT_JWKS_SERVICE_NAME=GATEWAY_BINDING`
 
 **Caching:**
 

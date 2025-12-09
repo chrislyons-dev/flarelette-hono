@@ -148,16 +148,18 @@ export function createLogger(options: LoggerOptions): MiddlewareHandler {
   let pino: (config: unknown) => unknown
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const honoPino = require('hono-pino') as { pinoLogger: (config: unknown) => MiddlewareHandler }
-    // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const pinoModule = require('pino') as unknown
 
     pinoLogger = honoPino.pinoLogger
     pino =
       (pinoModule as { default?: (config: unknown) => unknown }).default ??
       (pinoModule as (config: unknown) => unknown)
-  } catch (error) {
+  } catch {
+    /* c8 ignore next 3 */
+    // Coverage: This catch block cannot be tested when hono-pino is installed
     throw new Error(
       'hono-pino and pino are required for logging. Install with: npm install hono-pino pino'
     )

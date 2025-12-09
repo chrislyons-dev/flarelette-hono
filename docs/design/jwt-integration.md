@@ -19,6 +19,20 @@ Flarelette-Hono integrates with `@chrislyons-dev/flarelette-jwt` to provide JWT 
 
 ## Token Flow (RFC 8693 Pattern)
 
+### Gateway and Service Mesh Pattern
+
+**CRITICAL:** Both gateway and internal services use `flarelette-hono`. The only difference is the **JWKS resolution strategy**:
+
+- **Gateway**: Uses `JWT_JWKS_URL` (HTTP) to verify external OIDC tokens from Auth0, Okta, Google, Azure AD, or Cloudflare Access
+- **Internal Services**: Use `JWT_JWKS_SERVICE_NAME` (service binding) to verify internal tokens from gateway
+
+| Aspect | Gateway Worker | Internal Service |
+|--------|----------------|------------------|
+| **Middleware** | ✅ `authGuard()` from flarelette-hono | ✅ `authGuard()` from flarelette-hono |
+| **JWKS Source** | `JWT_JWKS_URL` (HTTP to OIDC provider) | `JWT_JWKS_SERVICE_NAME` (service binding) |
+| **Purpose** | Verify external OIDC, mint internal tokens | Verify internal tokens |
+| **Performance** | ~50-100ms (HTTP JWKS fetch + cache) | ~1-5ms (service binding) |
+
 ### Gateway-Minted Internal JWTs
 
 Every microservice endpoint requires an **internal JWT** (even "public" ones get an **anonymous** internal token).
@@ -26,12 +40,13 @@ Every microservice endpoint requires an **internal JWT** (even "public" ones get
 ```
 External Client
     │
-    │ (Bearer <Auth0/external token>)
+    │ (Bearer <Auth0/OIDC token>)
     ▼
 ┌─────────────────────┐
 │   Gateway Worker    │
+│  (flarelette-hono)  │
 │                     │
-│ 1. Verify external  │
+│ 1. authGuard()      │ ← Verifies via JWT_JWKS_URL (HTTP)
 │ 2. Token exchange   │
 │ 3. Mint internal    │
 └─────────────────────┘
@@ -43,7 +58,7 @@ External Client
 │  Service Worker     │
 │  (flarelette-hono)  │
 │                     │
-│ 1. authGuard()      │
+│ 1. authGuard()      │ ← Verifies via JWT_JWKS_SERVICE_NAME (binding)
 │ 2. Extract claims   │
 │ 3. Check policy     │
 │ 4. Business logic   │
@@ -74,14 +89,16 @@ Service verifies (JWKS/HS), applies policy, returns data
 ```
 Client ──(Authorization: Bearer <user access token>)──▶ Gateway
 
-Gateway:
-  • Validate external token (issuer=Auth0, etc.)
+Gateway (uses flarelette-hono):
+  • authGuard() validates external token via JWT_JWKS_URL (Auth0, Okta, etc.)
   • Perform "token exchange" semantics (RFC 8693)
   • Mint internal token with derived claims/permissions
 
 Gateway ──(Authorization: Bearer <internal>)──▶ Service
 
-Service verifies internal only, applies policy, returns data
+Service (uses flarelette-hono):
+  • authGuard() verifies internal token via JWT_JWKS_SERVICE_NAME (binding)
+  • Applies policy, returns data
 ```
 
 ---
@@ -174,7 +191,85 @@ app.get('/reports', authGuard(), async (c) => {
 
 ## Configuration Strategies
 
-### Strategy 1: EdDSA with Service Binding (Recommended)
+### Overview: Gateway vs Internal Services
+
+| Configuration | Gateway | Internal Services |
+|---------------|---------|-------------------|
+| **JWKS Source** | `JWT_JWKS_URL` (HTTP to OIDC provider) | `JWT_JWKS_SERVICE_NAME` (service binding) |
+| **Issuer** | External OIDC (Auth0, Okta, etc.) | Gateway (`https://gateway.internal`) |
+| **Audience** | External app client ID | Internal service ID |
+| **Purpose** | Verify external, mint internal | Verify internal |
+
+### Strategy 1: Gateway with HTTP JWKS (External OIDC)
+
+**Best for:** Gateway workers verifying external OIDC tokens
+
+**Benefits:**
+
+- Verify tokens from Auth0, Okta, Google, Azure AD, Cloudflare Access
+- Standard OIDC integration
+- HTTP JWKS caching (5 minutes)
+
+**Environment Variables:**
+
+```bash
+# External OIDC verification
+JWT_ISS=https://auth0.example.com/
+JWT_AUD=my-app-client-id
+JWT_JWKS_URL=https://auth0.example.com/.well-known/jwks.json
+JWT_LEEWAY_SECONDS=300
+
+# For minting internal tokens
+JWT_PRIVATE_JWK_NAME=GATEWAY_PRIVATE_KEY
+JWT_KID=gateway-2025-11
+```
+
+**wrangler.toml:**
+
+```toml
+name = "jwt-gateway"
+main = "src/gateway.ts"
+compatibility_date = "2025-10-01"
+
+[vars]
+# External OIDC verification (HTTP JWKS)
+JWT_ISS = "https://auth0.example.com/"
+JWT_AUD = "my-app-client-id"
+JWT_JWKS_URL = "https://auth0.example.com/.well-known/jwks.json"
+JWT_LEEWAY_SECONDS = "300"
+
+# For minting internal tokens
+JWT_PRIVATE_JWK_NAME = "GATEWAY_PRIVATE_KEY"
+JWT_KID = "gateway-2025-11"
+```
+
+**Gateway Code:**
+
+```typescript
+import { Hono } from 'hono'
+import { authGuard } from '@chrislyons-dev/flarelette-hono'
+import { sign } from '@chrislyons-dev/flarelette-jwt'
+import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
+
+const app = new Hono<HonoEnv>()
+
+// Verify external OIDC token via JWT_JWKS_URL, mint internal token
+app.post('/token-exchange', authGuard(), async (c) => {
+  const externalAuth = c.get('auth')  // Verified via HTTP JWKS
+
+  // Mint internal token for service mesh
+  const internalToken = await sign({
+    sub: externalAuth.sub,
+    email: externalAuth.email,
+    roles: deriveRoles(externalAuth),
+    permissions: derivePermissions(externalAuth)
+  })
+
+  return c.json({ token: internalToken })
+})
+```
+
+### Strategy 2: Internal Services with Service Binding (Recommended)
 
 **Best for:** Production, multi-service mesh, key rotation
 
@@ -202,14 +297,30 @@ main = "src/app.ts"
 compatibility_date = "2025-10-01"
 
 [[services]]
-binding = "GATEWAY_BINDING"
+binding = "GATEWAY"
 service = "jwt-gateway"
 environment = "production"
 
 [vars]
-JWT_JWKS_SERVICE_NAME = "GATEWAY_BINDING"
+JWT_JWKS_SERVICE_NAME = "GATEWAY"
 JWT_ISS = "https://gateway.internal"
 JWT_AUD = "bond-math.api"
+```
+
+**Internal Service Code:**
+
+```typescript
+import { Hono } from 'hono'
+import { authGuard } from '@chrislyons-dev/flarelette-hono'
+import type { HonoEnv } from '@chrislyons-dev/flarelette-hono'
+
+const app = new Hono<HonoEnv>()
+
+// Verify internal token via service binding
+app.get('/data', authGuard(), async (c) => {
+  const auth = c.get('auth')  // Verified via JWT_JWKS_SERVICE_NAME
+  return c.json({ data: [], user: auth.sub })
+})
 ```
 
 **Gateway Exposes JWKS:**
@@ -299,7 +410,7 @@ async function rotateGatewayKeypair() {
 }
 ```
 
-### Strategy 2: EdDSA with Inline Public Key
+### Strategy 3: EdDSA with Inline Public Key
 
 **Best for:** Simple deployments, single gateway, no rotation
 
@@ -345,7 +456,7 @@ echo '{"kty":"OKP","crv":"Ed25519","x":"..."}' | wrangler secret put GATEWAY_PUB
 - Coordinate deployment (brief downtime acceptable)
 - Use Strategy 1 (JWKS) for zero-downtime rotation
 
-### Strategy 3: HS512 with Shared Secret
+### Strategy 4: HS512 with Shared Secret
 
 **Best for:** Development, testing, single-service prototypes
 
@@ -387,7 +498,7 @@ JWT_AUD = "bond-math.api"
 ```bash
 # Generate and store 48-byte (384-bit) secret during deployment
 # Secret never stored in a variable or file
-openssl rand -base64 48 | wrangler secret put INTERNAL_JWT_SECRET --env production
+npx flarelette-jwt-secret --len=64 | wrangler secret put INTERNAL_JWT_SECRET --env production
 ```
 
 **Automated Rotation (Zero-Downtime):**
@@ -410,7 +521,7 @@ wrangler secret delete INTERNAL_JWT_SECRET --env production
 
 # 5. Rename new secret to current
 # (Regenerate and store as INTERNAL_JWT_SECRET without intermediate variables)
-openssl rand -base64 48 | wrangler secret put INTERNAL_JWT_SECRET --env production
+npx flarelette-jwt-secret --len=64 | wrangler secret put INTERNAL_JWT_SECRET --env production
 wrangler secret delete INTERNAL_JWT_SECRET_NEW --env production
 ```
 

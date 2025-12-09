@@ -86,7 +86,8 @@ JWT_SECRET_NAME = "INTERNAL_JWT_SECRET"
 Generate and store secret:
 
 ```bash
-openssl rand -base64 48 | wrangler secret put INTERNAL_JWT_SECRET
+# v1.13+ requires 64-byte minimum for HS512
+npx flarelette-jwt-secret --len=64 | wrangler secret put INTERNAL_JWT_SECRET
 ```
 
 ### 3. Minimal Example (Authentication Only)

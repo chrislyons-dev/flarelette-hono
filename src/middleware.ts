@@ -19,7 +19,7 @@ import type { HonoEnv, Policy, VerifyConfig } from './types.js'
  * @returns Token string if valid Bearer token, null otherwise
  */
 function extractBearerToken(authHeader: string | undefined): string | null {
-  if (authHeader === undefined || authHeader.length === 0) {
+  if (typeof authHeader !== 'string' || authHeader.length === 0) {
     return null
   }
 
@@ -35,6 +35,32 @@ function extractBearerToken(authHeader: string | undefined): string | null {
   }
 
   return token
+}
+
+/**
+ * Extract raw JWT token from CF-Access-Jwt-Assertion header
+ *
+ * @param headerValue - CF-Access-Jwt-Assertion header value
+ * @returns Token string if present, null otherwise
+ */
+function extractCfAccessToken(headerValue: string | undefined): string | null {
+  if (typeof headerValue !== 'string' || headerValue.length === 0) {
+    return null
+  }
+
+  const trimmed = headerValue.trim()
+  if (trimmed.length === 0) {
+    return null
+  }
+
+  // Cloudflare Access tokens might have Bearer prefix (edge case support)
+  // but typically are just raw JWT
+  if (trimmed.startsWith('Bearer ')) {
+    const token = trimmed.slice(7).trim()
+    return token.length > 0 ? token : null
+  }
+
+  return trimmed
 }
 
 /**
@@ -65,22 +91,31 @@ export function authGuard<T = Record<string, never>>(
   policy?: Policy
 ): MiddlewareHandler<HonoEnv<T>> {
   return async (c: Context<HonoEnv<T>>, next) => {
-    // Extract token from Authorization header
+    // Try to extract token from Authorization or CF-Access-Jwt-Assertion header
     const authHeader = c.req.header('Authorization')
-    const token = extractBearerToken(authHeader)
+    const cfAccessHeader = c.req.header('CF-Access-Jwt-Assertion')
+    let token: string | null = null
+    const authToken = extractBearerToken(authHeader)
+    if (authToken !== null) {
+      token = authToken
+    } else {
+      const cfToken = extractCfAccessToken(cfAccessHeader)
+      if (cfToken !== null) {
+        token = cfToken
+      }
+    }
 
     if (token === null) {
       return c.json(
         {
           error: 'unauthorized',
-          message: 'Missing or invalid Authorization header',
+          message: 'Missing or invalid Authorization or CF-Access-Jwt-Assertion header',
         },
         401
       )
     }
 
     // Verify token using flarelette-jwt
-    // c.env is typed as T & WorkerEnv (intersection), which satisfies makeKit's requirements
     const kit = adapters.makeKit(c.env)
     const payload = await kit.verify(token)
 
@@ -155,15 +190,25 @@ export function authGuardWithConfig<T = Record<string, never>>(
   policy?: Policy
 ): MiddlewareHandler<HonoEnv<T>> {
   return async (c: Context<HonoEnv<T>>, next) => {
-    // Extract token from Authorization header
+    // Try to extract token from Authorization or CF-Access-Jwt-Assertion header
     const authHeader = c.req.header('Authorization')
-    const token = extractBearerToken(authHeader)
+    const cfAccessHeader = c.req.header('CF-Access-Jwt-Assertion')
+    let token: string | null = null
+    const authToken = extractBearerToken(authHeader)
+    if (authToken !== null) {
+      token = authToken
+    } else {
+      const cfToken = extractCfAccessToken(cfAccessHeader)
+      if (cfToken !== null) {
+        token = cfToken
+      }
+    }
 
     if (token === null) {
       return c.json(
         {
           error: 'unauthorized',
-          message: 'Missing or invalid Authorization header',
+          message: 'Missing or invalid Authorization or CF-Access-Jwt-Assertion header',
         },
         401
       )

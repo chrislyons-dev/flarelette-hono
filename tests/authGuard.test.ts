@@ -98,7 +98,7 @@ describe('authGuard middleware', () => {
       const body = await res.json()
       expect(body).toEqual({
         error: 'unauthorized',
-        message: 'Missing or invalid Authorization header',
+        message: 'Missing or invalid Authorization or CF-Access-Jwt-Assertion header',
       })
     })
 

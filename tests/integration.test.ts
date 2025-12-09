@@ -406,7 +406,7 @@ describe('integration tests', () => {
       expect(body2).toEqual(body3)
       expect(body1).toEqual({
         error: 'unauthorized',
-        message: 'Missing or invalid Authorization header',
+        message: 'Missing or invalid Authorization or CF-Access-Jwt-Assertion header',
       })
     })
 

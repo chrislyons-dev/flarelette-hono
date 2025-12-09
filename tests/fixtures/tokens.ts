@@ -4,7 +4,7 @@
  * Provides helpers for creating valid and invalid JWT tokens for testing.
  */
 
-import { adapters, sign } from '@chrislyons-dev/flarelette-jwt'
+import { adapters } from '@chrislyons-dev/flarelette-jwt'
 import type { JwtPayload, JwtValue, WorkerEnv } from '@chrislyons-dev/flarelette-jwt'
 import { SignJWT } from 'jose'
 import { createMockEnv } from './mockEnv.js'
@@ -21,16 +21,12 @@ export async function createTestToken(
   env?: WorkerEnv
 ): Promise<string> {
   const testEnv = env ?? createMockEnv()
-  adapters.bindEnv(testEnv)
 
-  const fullPayload: JwtPayload = {
-    iss: testEnv.JWT_ISS,
-    aud: testEnv.JWT_AUD,
-    sub: 'test-user',
-    ...payload,
-  }
+  // Use the same approach as the middleware - makeKit()
+  const kit = adapters.makeKit(testEnv)
 
-  return sign(fullPayload, { ttlSeconds: 3600 })
+  // Sign using the kit (which uses the environment)
+  return kit.sign(payload, { ttlSeconds: 3600 })
 }
 
 /**
@@ -66,12 +62,12 @@ export async function createTokenWithPermissions(
  * Does NOT enforce issuer/audience constraints like sign() does.
  *
  * @param payload - JWT payload with arbitrary claims
- * @param secret - Secret key for signing (defaults to test secret)
+ * @param secret - Secret key for signing (defaults to 64-byte test secret)
  * @returns Signed JWT token string
  */
 export async function createMockToken(
   payload: Record<string, unknown>,
-  secret: string = 'test-secret-key-min-32-chars-long-for-hs512-algorithm'
+  secret: string = 'test-secret-key-for-hs512-must-be-at-least-64-bytes-long-aaaaaa'
 ): Promise<string> {
   const encoder = new TextEncoder()
   const secretKey = encoder.encode(secret)
