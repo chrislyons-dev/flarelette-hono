@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/chrislyons-dev/flarelette-hono/compare/v1.0.3...v1.1.0) (2025-12-09)
+
+
+### Features
+
+* **middleware:** add cloudflare access integration middleware ([#10](https://github.com/chrislyons-dev/flarelette-hono/issues/10)) ([b11e793](https://github.com/chrislyons-dev/flarelette-hono/commit/b11e793bcbcfb7e3cd848e2871132e5373fadc9c))
+
 ## [1.0.3](https://github.com/chrislyons-dev/flarelette-hono/compare/v1.0.2...v1.0.3) (2025-11-04)
 
 
